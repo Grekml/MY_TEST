@@ -35,6 +35,9 @@ const formatBytes = (value: number) => {
 export default function GalleryPage() {
   const [items, setItems] = useState<FileRecord[]>([]);
   const [selected, setSelected] = useState<FileRecord | null>(null);
+  const [votesMap, setVotesMap] = useState<Record<string, "like" | "dislike">>(
+    {}
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -45,8 +48,31 @@ export default function GalleryPage() {
     load();
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("galleryVotes");
+      if (stored) {
+        setVotesMap(JSON.parse(stored));
+      }
+    }
+  }, []);
+
+  const persistVotes = (nextMap: Record<string, "like" | "dislike">) => {
+    setVotesMap(nextMap);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("galleryVotes", JSON.stringify(nextMap));
+    }
+  };
+
   const updateVote = async (id: string, action: "like" | "dislike") => {
-    const response = await fetch(`/api/files/${id}/${action}`, { method: "POST" });
+    const prevVote = votesMap[id] ?? "none";
+    const nextVote = prevVote === action ? "none" : action;
+
+    const response = await fetch(`/api/files/${id}/vote`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prevVote, nextVote }),
+    });
     if (!response.ok) return;
     const data = await response.json();
     setItems((current) =>
@@ -60,6 +86,14 @@ export default function GalleryPage() {
           : item
       )
     );
+
+    const nextMap = { ...votesMap };
+    if (nextVote === "none") {
+      delete nextMap[id];
+    } else {
+      nextMap[id] = nextVote;
+    }
+    persistVotes(nextMap);
   };
 
   return (
@@ -101,7 +135,11 @@ export default function GalleryPage() {
                   <div className="flex items-center justify-between text-xs text-neutral-600">
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 rounded border border-neutral-200 px-2 py-1 text-xs hover:bg-neutral-100"
+                      className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs hover:bg-neutral-100 ${
+                        votesMap[item.id] === "like"
+                          ? "border-neutral-900"
+                          : "border-neutral-200"
+                      }`}
                       onClick={() => updateVote(item.id, "like")}
                     >
                       <svg
@@ -122,7 +160,11 @@ export default function GalleryPage() {
                     </button>
                     <button
                       type="button"
-                      className="inline-flex items-center gap-1 rounded border border-neutral-200 px-2 py-1 text-xs hover:bg-neutral-100"
+                      className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs hover:bg-neutral-100 ${
+                        votesMap[item.id] === "dislike"
+                          ? "border-neutral-900"
+                          : "border-neutral-200"
+                      }`}
                       onClick={() => updateVote(item.id, "dislike")}
                     >
                       <svg
