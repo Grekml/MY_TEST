@@ -1,0 +1,19 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: "production"
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "adminpass"
+      JWT_ACCESS_SECRET: "dev_access_secret_change_me"
+      JWT_REFRESH_SECRET: "dev_refresh_secret_change_me"
+      JWT_ACCESS_TTL_SECONDS: "900"
+      JWT_REFRESH_TTL_SECONDS: "2592000"
+      DATA_DIR: "/app/data"
+    volumes:
+      - ./data:/app/data

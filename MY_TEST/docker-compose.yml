@@ -1,0 +1,21 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "3000:3000"
+    environment:
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_PASSWORD: "adminpass"
+      JWT_ACCESS_SECRET: "dev_access_secret_change_me"
+      JWT_REFRESH_SECRET: "dev_refresh_secret_change_me"
+      JWT_ACCESS_TTL_SECONDS: "900"
+      JWT_REFRESH_TTL_SECONDS: "2592000"
+      DATA_DIR: "/app/data"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - ./data:/app/data
+    command: ["sh", "-c", "mkdir -p /app/data/uploads && npm run dev -- --hostname 0.0.0.0"]
