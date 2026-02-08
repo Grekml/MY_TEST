@@ -18,6 +18,18 @@ This project uses a named Docker volume to persist data across rebuilds.
 ./scripts/restore-data.sh backups/app_data_YYYY-MM-DD_HH-MM-SS.tar.gz
 ```
 
+### Weekly backup on macOS (launchd)
+```bash
+mkdir -p backups
+cp scripts/com.mytest.backup.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.mytest.backup.plist
+```
+
+To unload:
+```bash
+launchctl unload ~/Library/LaunchAgents/com.mytest.backup.plist
+```
+
 ## Getting Started
 
 First, run the development server:
