@@ -29,10 +29,13 @@ export default function AdminLoginPage() {
     setLoading(false);
 
     if (!response.ok) {
-      setError("Invalid credentials");
+      setError("Неверная почта или пароль");
       return;
     }
 
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem("adminEmail", email);
+    }
     router.push("/admin");
   };
 
@@ -40,12 +43,12 @@ export default function AdminLoginPage() {
     <main className="min-h-screen flex items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Admin Login</CardTitle>
+          <CardTitle>Вход в админку</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Почта</Label>
               <Input
                 id="email"
                 type="email"
@@ -55,7 +58,7 @@ export default function AdminLoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Пароль</Label>
               <Input
                 id="password"
                 type="password"
@@ -68,7 +71,7 @@ export default function AdminLoginPage() {
               <p className="text-sm text-red-600">{error}</p>
             ) : null}
             <Button type="submit" disabled={loading} className="w-full">
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Вход..." : "Войти"}
             </Button>
           </form>
         </CardContent>

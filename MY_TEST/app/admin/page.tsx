@@ -5,6 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Table,
   TableBody,
   TableCell,
@@ -41,6 +49,7 @@ export default function AdminPage() {
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     const requestFiles = () =>
@@ -58,7 +67,7 @@ export default function AdminPage() {
     }
 
     if (!response.ok) {
-      setError("Failed to load files. Are you logged in?");
+      setError("Не удалось загрузить файлы. Вы вошли в систему?");
       return;
     }
 
@@ -69,6 +78,12 @@ export default function AdminPage() {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setAdminEmail(window.sessionStorage.getItem("adminEmail"));
+    }
+  }, []);
 
   const handleUpload = async (files: FileList | File[]) => {
     const fileArray = Array.from(files);
@@ -90,7 +105,7 @@ export default function AdminPage() {
 
     if (!response.ok) {
       const body = await response.json().catch(() => ({}));
-      setError(body.error ?? "Upload failed");
+      setError(body.error ?? "Ошибка загрузки");
       return;
     }
 
@@ -118,13 +133,49 @@ export default function AdminPage() {
     navigator.clipboard.writeText(url).catch(() => null);
   };
 
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem("adminEmail");
+      window.location.href = "/admin/login";
+    }
+  };
+
   const rowCountLabel = useMemo(() => `${items.length} files`, [items.length]);
 
   return (
     <main className="min-h-screen p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Админка</h1>
+          <p className="text-sm text-neutral-600">
+            Управление загрузками и статусами.
+          </p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="h-10 w-10 rounded-full p-0"
+              aria-label="Profile"
+            >
+              <span className="text-sm font-medium">
+                {adminEmail?.[0]?.toUpperCase() ?? "A"}
+              </span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>
+              {adminEmail ?? "admin@example.com"}
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleLogout}>Выйти</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <Card>
         <CardHeader>
-          <CardTitle>Uploads</CardTitle>
+          <CardTitle>Загрузки</CardTitle>
         </CardHeader>
         <CardContent>
           <div
@@ -139,7 +190,7 @@ export default function AdminPage() {
             onDrop={handleDrop}
           >
             <p className="text-sm text-neutral-600">
-              Drag and drop files here, or choose files to upload.
+              Перетащите файлы сюда или выберите их для загрузки.
             </p>
             <Input
               type="file"
@@ -151,7 +202,7 @@ export default function AdminPage() {
               }}
             />
             <Button disabled={uploading} onClick={() => fetchItems()}>
-              {uploading ? "Uploading..." : "Refresh"}
+              {uploading ? "Загрузка..." : "Обновить"}
             </Button>
           </div>
           {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
@@ -160,19 +211,19 @@ export default function AdminPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Files ({rowCountLabel})</CardTitle>
+          <CardTitle>Файлы ({rowCountLabel})</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Preview</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Size</TableHead>
-                <TableHead>Votes</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>Превью</TableHead>
+                <TableHead>Название</TableHead>
+                <TableHead>Тип</TableHead>
+                <TableHead>Размер</TableHead>
+                <TableHead>Оценки</TableHead>
+                <TableHead>Статус</TableHead>
+                <TableHead className="text-right">Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -235,7 +286,7 @@ export default function AdminPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {item.deletedAt ? "Hidden" : "Visible"}
+                    {item.deletedAt ? "Скрыт" : "Виден"}
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
@@ -244,7 +295,7 @@ export default function AdminPage() {
                         size="sm"
                         onClick={() => handleCopy(item.id)}
                       >
-                        Copy URL
+                        Скопировать URL
                       </Button>
                       <Button
                         variant={item.deletedAt ? "secondary" : "destructive"}
@@ -253,7 +304,7 @@ export default function AdminPage() {
                           handleHideRestore(item.id, Boolean(item.deletedAt))
                         }
                       >
-                        {item.deletedAt ? "Restore" : "Hide"}
+                        {item.deletedAt ? "Восстановить" : "Скрыть"}
                       </Button>
                     </div>
                   </TableCell>

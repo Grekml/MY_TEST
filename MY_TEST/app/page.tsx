@@ -8,22 +8,21 @@ export default function Home() {
       <div className="mx-auto max-w-5xl space-y-12">
         <section className="space-y-6">
           <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
-            File Gallery
+            Галерея файлов
           </p>
           <h1 className="text-4xl font-semibold leading-tight sm:text-5xl">
-            A clean home for your uploads
+            Удобный дом для ваших загрузок
           </h1>
           <p className="max-w-2xl text-base text-neutral-600">
-            Browse a curated gallery of mixed files and manage uploads from a
-            protected admin workspace. Built with Next.js, shadcn/ui, and
-            SQLite.
+            Просматривайте галерею файлов и управляйте загрузками в защищенной
+            админке. Проект построен на Next.js, shadcn/ui и SQLite.
           </p>
           <div className="flex flex-wrap gap-3">
             <Button asChild>
-              <Link href="/gallery">View Gallery</Link>
+              <Link href="/gallery">Открыть галерею</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/admin/login">Admin Login</Link>
+              <Link href="/admin/login">Вход в админку</Link>
             </Button>
           </div>
         </section>
@@ -31,16 +30,16 @@ export default function Home() {
         <section className="grid gap-6 md:grid-cols-3">
           {[
             {
-              title: "Mixed file support",
-              text: "Images, PDFs, and archives live side-by-side with rich metadata.",
+              title: "Разные типы файлов",
+              text: "Изображения, PDF и архивы в одной галерее с метаданными.",
             },
             {
-              title: "Fast admin workflow",
-              text: "Drag-and-drop multi-upload, hide or restore files instantly.",
+              title: "Быстрая админка",
+              text: "Мультизагрузка и скрытие/восстановление в один клик.",
             },
             {
               title: "Docker-first",
-              text: "Run everything locally with persistent storage on volumes.",
+              text: "Локальный запуск с надежным хранением в volume.",
             },
           ].map((item) => (
             <Card key={item.title}>

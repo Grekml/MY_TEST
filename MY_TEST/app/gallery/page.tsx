@@ -66,9 +66,9 @@ export default function GalleryPage() {
     <main className="min-h-screen px-6 py-12">
       <div className="mx-auto max-w-6xl space-y-8">
         <div>
-          <h1 className="text-3xl font-semibold">Gallery</h1>
+          <h1 className="text-3xl font-semibold">Галерея</h1>
           <p className="mt-2 text-sm text-neutral-600">
-            Browse the latest uploads.
+            Смотрите последние загрузки.
           </p>
         </div>
 
@@ -94,7 +94,7 @@ export default function GalleryPage() {
                       asChild
                     >
                       <a href={fileUrl} download>
-                        Download
+                        Скачать
                       </a>
                     </Button>
                   </div>
@@ -160,7 +160,7 @@ export default function GalleryPage() {
                     </button>
                   ) : (
                     <div className="rounded-md border border-dashed border-neutral-200 bg-neutral-50 px-3 py-8 text-center text-sm text-neutral-500">
-                      No preview available
+                      Превью недоступно
                     </div>
                   )}
                 </CardContent>
