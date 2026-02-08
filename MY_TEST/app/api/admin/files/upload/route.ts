@@ -15,6 +15,25 @@ const maxFileSize = 50 * 1024 * 1024;
 const sanitizeName = (name: string) =>
   name.replace(/[^a-zA-Z0-9._-]/g, "_");
 
+const imageMimeTypes = new Set([
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/svg+xml",
+]);
+
+const guessMimeType = (name: string) => {
+  const lower = name.toLowerCase();
+  if (lower.endsWith(".jpg") || lower.endsWith(".jpeg")) return "image/jpeg";
+  if (lower.endsWith(".png")) return "image/png";
+  if (lower.endsWith(".webp")) return "image/webp";
+  if (lower.endsWith(".gif")) return "image/gif";
+  if (lower.endsWith(".svg")) return "image/svg+xml";
+  return "application/octet-stream";
+};
+
 export async function POST(request: Request) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(cookieConfig.accessName)?.value;
@@ -62,13 +81,16 @@ export async function POST(request: Request) {
     const arrayBuffer = await entry.arrayBuffer();
     await writeFile(storedPath, Buffer.from(arrayBuffer));
 
+    const mimeType = entry.type || guessMimeType(entry.name || storedFileName);
+    const isImage = imageMimeTypes.has(mimeType);
+
     inserted.push({
       id: fileId,
       originalName: entry.name || storedFileName,
       storedPath,
-      mimeType: entry.type || "application/octet-stream",
+      mimeType,
       sizeBytes: entry.size,
-      isImage: entry.type.startsWith("image/"),
+      isImage,
       createdAt: now,
     });
   }

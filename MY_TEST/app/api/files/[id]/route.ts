@@ -28,10 +28,12 @@ export async function GET(
   }
 
   const disposition = record.isImage ? "inline" : "attachment";
+  const safeName = record.originalName.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const encodedName = encodeURIComponent(record.originalName);
   return new NextResponse(buffer, {
     headers: {
       "Content-Type": record.mimeType,
-      "Content-Disposition": `${disposition}; filename="${record.originalName}"`,
+      "Content-Disposition": `${disposition}; filename="${safeName}"; filename*=UTF-8''${encodedName}`,
     },
   });
 }
