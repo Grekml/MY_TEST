@@ -81,10 +81,14 @@ export default function GalleryPage() {
                   </div>
                   {isImage ? (
                     <button
-                      className="w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 py-8 text-sm"
+                      className="w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-50"
                       onClick={() => setSelected(item)}
                     >
-                      Preview Image
+                      <img
+                        alt={item.originalName}
+                        src={fileUrl}
+                        className="h-48 w-full object-cover"
+                      />
                     </button>
                   ) : (
                     <div className="rounded-md border border-dashed border-neutral-200 bg-neutral-50 px-3 py-8 text-center text-sm text-neutral-500">
