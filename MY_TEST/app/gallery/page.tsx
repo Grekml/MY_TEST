@@ -84,11 +84,16 @@ export default function GalleryPage() {
                       className="w-full overflow-hidden rounded-md border border-neutral-200 bg-neutral-50"
                       onClick={() => setSelected(item)}
                     >
-                      <img
-                        alt={item.originalName}
-                        src={fileUrl}
-                        className="h-48 w-full object-cover"
-                      />
+                      <div
+                        className="w-full"
+                        style={{ aspectRatio: "1 / 1" }}
+                      >
+                        <img
+                          alt={item.originalName}
+                          src={fileUrl}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
                     </button>
                   ) : (
                     <div className="rounded-md border border-dashed border-neutral-200 bg-neutral-50 px-3 py-8 text-center text-sm text-neutral-500">
