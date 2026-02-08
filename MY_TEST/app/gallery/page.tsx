@@ -98,23 +98,49 @@ export default function GalleryPage() {
                       </a>
                     </Button>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-neutral-600">
-                    <Button
+                  <div className="flex items-center justify-between text-xs text-neutral-600">
+                    <button
                       type="button"
-                      variant="outline"
-                      size="sm"
+                      className="inline-flex items-center gap-1 rounded border border-neutral-200 px-2 py-1 text-xs hover:bg-neutral-100"
                       onClick={() => updateVote(item.id, "like")}
                     >
-                      Like · {item.likeCount ?? 0}
-                    </Button>
-                    <Button
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M7 10v12" />
+                        <path d="M15 5l-4 5v12h6.4a2 2 0 0 0 1.9-1.4l2-7a2 2 0 0 0-1.9-2.6H11" />
+                        <path d="M7 10a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2" />
+                      </svg>
+                      <span>{item.likeCount ?? 0}</span>
+                    </button>
+                    <button
                       type="button"
-                      variant="outline"
-                      size="sm"
+                      className="inline-flex items-center gap-1 rounded border border-neutral-200 px-2 py-1 text-xs hover:bg-neutral-100"
                       onClick={() => updateVote(item.id, "dislike")}
                     >
-                      Dislike · {item.dislikeCount ?? 0}
-                    </Button>
+                      <svg
+                        viewBox="0 0 24 24"
+                        aria-hidden="true"
+                        className="h-4 w-4"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M17 14V2" />
+                        <path d="M9 19l4-5V2H6.6a2 2 0 0 0-1.9 1.4l-2 7A2 2 0 0 0 4.6 13H13" />
+                        <path d="M17 14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2" />
+                      </svg>
+                      <span>{item.dislikeCount ?? 0}</span>
+                    </button>
                   </div>
                   {isImage ? (
                     <button
