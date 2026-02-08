@@ -155,6 +155,7 @@ export default function AdminPage() {
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Size</TableHead>
+                <TableHead>Votes</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -180,6 +181,44 @@ export default function AdminPage() {
                   </TableCell>
                   <TableCell>{item.mimeType}</TableCell>
                   <TableCell>{formatBytes(item.sizeBytes)}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-3 text-xs text-neutral-600">
+                      <span className="inline-flex items-center gap-1">
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M7 10v12" />
+                          <path d="M15 5l-4 5v12h6.4a2 2 0 0 0 1.9-1.4l2-7a2 2 0 0 0-1.9-2.6H11" />
+                          <path d="M7 10a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2" />
+                        </svg>
+                        <span>{item.likeCount ?? 0}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <svg
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M17 14V2" />
+                          <path d="M9 19l4-5V2H6.6a2 2 0 0 0-1.9 1.4l-2 7A2 2 0 0 0 4.6 13H13" />
+                          <path d="M17 14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2" />
+                        </svg>
+                        <span>{item.dislikeCount ?? 0}</span>
+                      </span>
+                    </div>
+                  </TableCell>
                   <TableCell>
                     {item.deletedAt ? "Hidden" : "Visible"}
                   </TableCell>
