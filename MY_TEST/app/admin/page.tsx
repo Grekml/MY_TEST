@@ -151,6 +151,7 @@ export default function AdminPage() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Preview</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Size</TableHead>
@@ -161,6 +162,19 @@ export default function AdminPage() {
             <TableBody>
               {items.map((item) => (
                 <TableRow key={item.id}>
+                  <TableCell>
+                    {Boolean(item.isImage) ? (
+                      <div className="h-8 w-8 overflow-hidden rounded border border-neutral-200">
+                        <img
+                          alt={item.originalName}
+                          src={`/api/files/${item.id}`}
+                          className="h-full w-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="h-8 w-8 rounded border border-dashed border-neutral-200 bg-neutral-50" />
+                    )}
+                  </TableCell>
                   <TableCell className="font-medium">
                     {item.originalName}
                   </TableCell>
