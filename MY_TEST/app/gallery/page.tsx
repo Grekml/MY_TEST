@@ -16,6 +16,8 @@ type FileRecord = {
   mimeType: string;
   sizeBytes: number;
   isImage: number | boolean;
+  likeCount: number;
+  dislikeCount: number;
 };
 
 const formatBytes = (value: number) => {
@@ -42,6 +44,23 @@ export default function GalleryPage() {
     };
     load();
   }, []);
+
+  const updateVote = async (id: string, action: "like" | "dislike") => {
+    const response = await fetch(`/api/files/${id}/${action}`, { method: "POST" });
+    if (!response.ok) return;
+    const data = await response.json();
+    setItems((current) =>
+      current.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              likeCount: data.likeCount ?? item.likeCount,
+              dislikeCount: data.dislikeCount ?? item.dislikeCount,
+            }
+          : item
+      )
+    );
+  };
 
   return (
     <main className="min-h-screen px-6 py-12">
@@ -77,6 +96,24 @@ export default function GalleryPage() {
                       <a href={fileUrl} download>
                         Download
                       </a>
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-neutral-600">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateVote(item.id, "like")}
+                    >
+                      Like · {item.likeCount ?? 0}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateVote(item.id, "dislike")}
+                    >
+                      Dislike · {item.dislikeCount ?? 0}
                     </Button>
                   </div>
                   {isImage ? (

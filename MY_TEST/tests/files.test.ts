@@ -15,6 +15,8 @@ describe("files metadata", () => {
         mime_type TEXT NOT NULL,
         size_bytes INTEGER NOT NULL,
         is_image INTEGER NOT NULL,
+        like_count INTEGER NOT NULL DEFAULT 0,
+        dislike_count INTEGER NOT NULL DEFAULT 0,
         created_at INTEGER NOT NULL,
         deleted_at INTEGER
       );
