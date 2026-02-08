@@ -17,5 +17,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-      - ./data:/app/data
+      - app_data:/app/data
     command: ["sh", "-c", "mkdir -p /app/data/uploads && npm run dev -- --hostname 0.0.0.0"]
+
+volumes:
+  app_data:
