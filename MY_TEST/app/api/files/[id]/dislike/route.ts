@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { files } from "@/lib/schema";
 
@@ -14,8 +14,7 @@ export async function POST(
   const result = db
     .update(files)
     .set({ dislikeCount: sql`${files.dislikeCount} + 1` })
-    .where(eq(files.id, id))
-    .where(isNull(files.deletedAt))
+    .where(and(eq(files.id, id), isNull(files.deletedAt)))
     .run();
 
   if (!result.changes) {
