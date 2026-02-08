@@ -43,11 +43,25 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
-    const response = await fetch("/api/admin/files", { cache: "no-store" });
+    const requestFiles = () =>
+      fetch("/api/admin/files", { cache: "no-store", credentials: "include" });
+
+    let response = await requestFiles();
+    if (response.status === 401) {
+      const refresh = await fetch("/api/auth/refresh", {
+        method: "POST",
+        credentials: "include",
+      });
+      if (refresh.ok) {
+        response = await requestFiles();
+      }
+    }
+
     if (!response.ok) {
       setError("Failed to load files. Are you logged in?");
       return;
     }
+
     const data = await response.json();
     setItems(data.items ?? []);
   }, []);
@@ -69,6 +83,7 @@ export default function AdminPage() {
     const response = await fetch("/api/admin/files/upload", {
       method: "POST",
       body: formData,
+      credentials: "include",
     });
 
     setUploading(false);
@@ -94,7 +109,7 @@ export default function AdminPage() {
     const endpoint = restore
       ? `/api/admin/files/${id}/restore`
       : `/api/admin/files/${id}/hide`;
-    await fetch(endpoint, { method: "POST" });
+    await fetch(endpoint, { method: "POST", credentials: "include" });
     await fetchItems();
   };
 
