@@ -23,6 +23,8 @@ import {
 
 type FileRecord = {
   id: string;
+  title: string;
+  description: string;
   originalName: string;
   storedPath: string;
   mimeType: string;
@@ -72,7 +74,12 @@ export default function AdminPage() {
     }
 
     const data = await response.json();
-    setItems(data.items ?? []);
+    const hydrated = (data.items ?? []).map((item: FileRecord) => ({
+      ...item,
+      title: item.title || item.originalName,
+      description: item.description || item.originalName,
+    }));
+    setItems(hydrated);
   }, []);
 
   useEffect(() => {
@@ -290,22 +297,51 @@ export default function AdminPage() {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleCopy(item.id)}
-                      >
-                        Скопировать URL
-                      </Button>
-                      <Button
-                        variant={item.deletedAt ? "secondary" : "destructive"}
-                        size="sm"
-                        onClick={() =>
-                          handleHideRestore(item.id, Boolean(item.deletedAt))
-                        }
-                      >
-                        {item.deletedAt ? "Восстановить" : "Скрыть"}
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            aria-label="Меню"
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                              className="h-4 w-4"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="12" cy="5" r="1.5" />
+                              <circle cx="12" cy="12" r="1.5" />
+                              <circle cx="12" cy="19" r="1.5" />
+                            </svg>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() =>
+                              (window.location.href = `/admin/files/${item.id}/edit`)
+                            }
+                          >
+                            Редактировать
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleCopy(item.id)}>
+                            Скопировать URL
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleHideRestore(item.id, Boolean(item.deletedAt))
+                            }
+                          >
+                            {item.deletedAt ? "Восстановить" : "Удалить"}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>

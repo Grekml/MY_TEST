@@ -11,6 +11,8 @@ export const adminSessions = sqliteTable("admin_sessions", {
 
 export const files = sqliteTable("files", {
   id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
   originalName: text("original_name").notNull(),
   storedPath: text("stored_path").notNull(),
   mimeType: text("mime_type").notNull(),

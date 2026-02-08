@@ -84,9 +84,12 @@ export async function POST(request: Request) {
     const mimeType = entry.type || guessMimeType(entry.name || storedFileName);
     const isImage = imageMimeTypes.has(mimeType);
 
+    const baseName = entry.name || storedFileName;
     inserted.push({
       id: fileId,
-      originalName: entry.name || storedFileName,
+      title: baseName,
+      description: baseName,
+      originalName: baseName,
       storedPath,
       mimeType,
       sizeBytes: entry.size,
