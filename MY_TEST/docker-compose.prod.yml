@@ -17,6 +17,7 @@ services:
       DATA_DIR: "/app/data"
     volumes:
       - app_data:/app/data
+    command: ["sh", "-c", "npm run db:migrate && npm run start -- -H 0.0.0.0"]
 
 volumes:
   app_data:
