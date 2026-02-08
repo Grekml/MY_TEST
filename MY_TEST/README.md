@@ -1,5 +1,23 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Safe data storage (uploads + SQLite)
+
+This project uses a named Docker volume to persist data across rebuilds.
+
+### IMPORTANT
+- Do not run `docker compose down -v` unless you want to delete ALL data.
+- Keep the named volume `my_test_app_data` for persistence.
+
+### Backup
+```bash
+./scripts/backup-data.sh
+```
+
+### Restore
+```bash
+./scripts/restore-data.sh backups/app_data_YYYY-MM-DD_HH-MM-SS.tar.gz
+```
+
 ## Getting Started
 
 First, run the development server:
