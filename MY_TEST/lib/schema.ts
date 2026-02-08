@@ -16,6 +16,8 @@ export const files = sqliteTable("files", {
   mimeType: text("mime_type").notNull(),
   sizeBytes: integer("size_bytes").notNull(),
   isImage: integer("is_image", { mode: "boolean" }).notNull(),
+  likeCount: integer("like_count").notNull().default(0),
+  dislikeCount: integer("dislike_count").notNull().default(0),
   createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
   deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
 });
