@@ -31,7 +31,9 @@ type FileRecord = {
   sizeBytes: number;
   isImage: number | boolean;
   createdAt: number;
-  deletedAt?: number | null;
+  deletedAt?: number | null
+  likeCount?: number;
+  dislikeCount?: number;
 };
 
 const formatBytes = (value: number) => {
