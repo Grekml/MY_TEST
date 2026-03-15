@@ -1,26 +1,31 @@
-import { LinkPreviewDemoSecond } from "../components/ui/link-preview-demo-second";
-import RealtimeSinceCounter from '@/components/ui/realtime-since-counter';
+import Link from "next/link";
+import RealtimeSinceCounter from "@/components/ui/realtime-since-counter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import SterlingGateKineticNavigationDemo from '../components/ui/sterling-gate-kinetic-navigation-demo';
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-6 py-16 relative" style={{ backgroundColor: '#151922' }}>
-      {/* Deep overlay to achieve the darker backdrop (#0f121a) while keeping the base navy visible */}
-      <div className="absolute inset-0" style={{ backgroundColor: '#0f121a', opacity: 0.85 }} aria-hidden="true" />
+    <main
+      className="relative min-h-screen px-6 py-16"
+      style={{ backgroundColor: "#151922" }}
+    >
+      <div
+        className="absolute inset-0"
+        style={{ backgroundColor: "#0f121a", opacity: 0.85 }}
+        aria-hidden="true"
+      />
       <div className="mx-auto max-w-5xl space-y-14 relative z-10">
-        {/* Hero / Intro with premium typographic hierarchy */}
         <section id="intro" className="space-y-4 text-center">
-            <h1
+          <h1
             className="mx-auto text-6xl sm:text-7xl font-extrabold tracking-tight uppercase bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500"
             aria-label="THE NEXT LEVEL"
           >
             THE NEXT LEVEL
           </h1>
-          <div style={{ display: 'flex', justifyContent: 'center', marginTop: 8 }}>
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
             <RealtimeSinceCounter />
           </div>
         </section>
+
         <section id="tools-process" className="pt-6 pb-8">
           <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
             <CardHeader className="px-4 py-3 border-b border-white/10">
@@ -45,77 +50,15 @@ export default function Home() {
               </ul>
             </CardContent>
           </Card>
+          <div className="pt-6 text-center">
+            <Link
+              href="/projects"
+              className="inline-flex min-w-[170px] items-center justify-center rounded-full border border-yellow-300/90 bg-white/15 px-8 py-2 text-sm font-semibold text-yellow-300 transition hover:bg-white/25"
+            >
+              Projects
+            </Link>
+          </div>
         </section>
-
-        {/* Navigation showcase */}
-        <div className="-mt-2">
-          <SterlingGateKineticNavigationDemo />
-        </div>
-
-        {/* Project sections (preserve IDs and names; render as refined glass cards) */}
-        <section id="project-files" className="pt-6 pb-8">
-          <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
-            <CardHeader className="px-4 py-3 border-b border-white/10">
-              <CardTitle className="text-2xl text-neutral-100">ScanWow</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-3 text-neutral-200">
-              <p>Gallery, media and assets for the landing project.</p>
-            </CardContent>
-          </Card>
-        </section>
-        <section id="project-admin" className="pt-6 pb-8">
-          <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
-            <CardHeader className="px-4 py-3 border-b border-white/10">
-              <CardTitle className="text-2xl text-neutral-100">LinX</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-3 text-neutral-200">
-              <p>Administrative interfaces and workflows described here.</p>
-            </CardContent>
-          </Card>
-        </section>
-        <section id="project-docker" className="pt-6 pb-8">
-          <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
-            <CardHeader className="px-4 py-3 border-b border-white/10">
-              <CardTitle className="text-2xl text-neutral-100">Юркас</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-3 text-neutral-200">
-              <ul className="list-disc pl-5">
-                <li>Тестировал доработки SSO: проверял эндпоинт (username, e-mail, телефон) и права доступа роли пользователя.</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
-        <section id="project-team" className="pt-6 pb-8">
-          <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
-            <CardHeader className="px-4 py-3 border-b border-white/10">
-              <CardTitle className="text-2xl text-neutral-100">Binary Options</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-3 text-neutral-200">
-              <p>Collaborative notes and feedback.</p>
-            </CardContent>
-          </Card>
-        </section>
-        <section id="project-b2box" className="pt-6 pb-8">
-          <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
-            <CardHeader className="px-4 py-3 border-b border-white/10">
-              <CardTitle className="text-2xl text-neutral-100">B2Box</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-3 text-neutral-200">
-              <ul className="list-disc pl-5">
-                <li>Протестировал задачи в сжатые сроки</li>
-                <li>Протестировал интеграцию почты: массовые рассылки и механизм приглашений по временным токенам</li>
-                <li>После окончания тестирования написал документацию для заказчика</li>
-              </ul>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Secondary demo section preserved */}
-        <section className="pt-8">
-          <LinkPreviewDemoSecond />
-        </section>
-
-        {/* Feature highlights as glass cards (refined visuals) */}
         <section className="grid gap-6 md:grid-cols-3">
           {[
             {
