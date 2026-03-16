@@ -34,7 +34,7 @@ export default async function ProjectDetailsPage({ params }: Props) {
 
         <Card className="border border-white/10 bg-white/5 text-white shadow-lg">
           <CardHeader>
-            <CardTitle className="text-2xl">Описание проекта</CardTitle>
+            <CardTitle className="text-2xl">Что я тестировал</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-white/85">{project.short}</p>
