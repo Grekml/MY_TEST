@@ -19,6 +19,8 @@ export default async function ProjectDetailsPage({ params }: Props) {
     notFound();
   }
 
+  const detailsIntro = project.detailsShort ?? project.short;
+
   return (
     <main className="min-h-screen bg-[#0f121a] px-6 py-12 text-white">
       <div className="mx-auto max-w-4xl space-y-6">
@@ -37,8 +39,8 @@ export default async function ProjectDetailsPage({ params }: Props) {
             <CardTitle className="text-2xl">Что я тестировал</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4 pt-0">
-            {project.short.trim().length > 0 ? (
-              <p className="text-white/85">{project.short}</p>
+            {detailsIntro.trim().length > 0 ? (
+              <p className="text-white/85">{detailsIntro}</p>
             ) : null}
             {project.tested && project.tested.length > 0 ? (
               <ul className="list-disc space-y-2 pl-5 text-white/85">
