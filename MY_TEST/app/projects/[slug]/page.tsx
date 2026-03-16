@@ -38,6 +38,7 @@ export default async function ProjectDetailsPage({ params }: Props) {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-white/85">{project.short}</p>
+            <p className="text-white/85">В ходе тестирования находил такие значимые баги, как:</p>
             <ul className="list-disc space-y-2 pl-5 text-white/85">
               {project.highlights.map((item) => (
                 <li key={item}>{item}</li>
