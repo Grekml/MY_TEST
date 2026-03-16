@@ -66,6 +66,17 @@ export default async function ProjectDetailsPage({ params }: Props) {
                 </ul>
               </>
             ) : null}
+
+            {project.contribution && project.contribution.length > 0 ? (
+              <>
+                <h2 className="pt-2 text-2xl font-semibold text-white">Мой вклад</h2>
+                <ul className="list-disc space-y-2 pl-5 text-white/85">
+                  {project.contribution.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
           </CardContent>
         </Card>
       </div>
