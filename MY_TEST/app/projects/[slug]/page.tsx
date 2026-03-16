@@ -32,18 +32,38 @@ export default async function ProjectDetailsPage({ params }: Props) {
           </Link>
         </div>
 
-        <Card className="border border-white/10 bg-white/5 text-white shadow-lg">
-          <CardHeader>
+        <Card className="gap-2 border border-white/10 bg-white/5 text-white shadow-lg">
+          <CardHeader className="pb-0">
             <CardTitle className="text-2xl">Что я тестировал</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-white/85">{project.short}</p>
-            <p className="text-white/85">В ходе тестирования находил такие значимые баги, как:</p>
-            <ul className="list-disc space-y-2 pl-5 text-white/85">
-              {project.highlights.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
+          <CardContent className="space-y-4 pt-0">
+            {project.short.trim().length > 0 ? (
+              <p className="text-white/85">{project.short}</p>
+            ) : null}
+            {project.tested && project.tested.length > 0 ? (
+              <ul className="list-disc space-y-2 pl-5 text-white/85">
+                {project.tested.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : (
+              <ul className="list-disc space-y-2 pl-5 text-white/85">
+                {project.highlights.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            )}
+
+            {project.bugs && project.bugs.length > 0 ? (
+              <>
+                <h2 className="pt-2 text-2xl font-semibold text-white">Какие значимые проблемы находил</h2>
+                <ul className="list-disc space-y-2 pl-5 text-white/85">
+                  {project.bugs.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
           </CardContent>
         </Card>
       </div>
