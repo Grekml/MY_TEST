@@ -2,6 +2,7 @@ export type ProjectInfo = {
   slug: string;
   title: string;
   short: string;
+  detailsShort?: string;
   highlights: string[];
   tested?: string[];
   bugs?: string[];
@@ -25,7 +26,9 @@ export const PROJECTS: ProjectInfo[] = [
   {
     slug: "linx",
     title: "LinX",
-    short: "",
+    short:
+      "Тестировал мобильные пользовательские сценарии, админку, медиаконтент и AI-модерацию через WebPurify API.",
+    detailsShort: "",
     highlights: [],
     tested: [
       "пользовательские сценарии мобильного приложения: авторизация, лента, поиск, чаты и групповые чаты;",
