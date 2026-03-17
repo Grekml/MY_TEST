@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type FileRecord = {
   id: string;
@@ -30,6 +32,8 @@ type FileRecord = {
   mimeType: string;
   sizeBytes: number;
   isImage: number | boolean;
+  likeCount?: number;
+  dislikeCount?: number;
   createdAt: number;
   deletedAt?: number | null;
 };
@@ -47,11 +51,23 @@ const formatBytes = (value: number) => {
 };
 
 export default function AdminPage() {
+  const { theme, setTheme } = useTheme();
   const [items, setItems] = useState<FileRecord[]>([]);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
+  const isDark = theme === "dark";
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  const stats = useMemo(() => {
+    const total = items.length;
+    const hidden = items.filter((item) => Boolean(item.deletedAt)).length;
+    const visible = total - hidden;
+    const images = items.filter((item) => Boolean(item.isImage)).length;
+    return { total, hidden, visible, images };
+  }, [items]);
 
   const fetchItems = useCallback(async () => {
     const requestFiles = () =>
@@ -148,46 +164,197 @@ export default function AdminPage() {
     }
   };
 
-  const rowCountLabel = useMemo(() => `${items.length} files`, [items.length]);
+  const filteredItems = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    const byFilter = items.filter((item) => {
+      if (filter === "visible") return !item.deletedAt;
+      if (filter === "hidden") return Boolean(item.deletedAt);
+      if (filter === "images") return Boolean(item.isImage);
+      return true;
+    });
+
+    if (!normalizedQuery) return byFilter;
+
+    return byFilter.filter((item) => {
+      const haystack = [
+        item.title,
+        item.description,
+        item.originalName,
+        item.mimeType,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(normalizedQuery);
+    });
+  }, [items, query, filter]);
+
+  const rowCountLabel = useMemo(
+    () => `${filteredItems.length} из ${items.length}`,
+    [filteredItems.length, items.length]
+  );
 
   return (
-    <main className="min-h-screen p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Админка</h1>
-          <p className="text-sm text-neutral-600">
-            Управление загрузками и статусами.
-          </p>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="h-10 w-10 rounded-full p-0"
-              aria-label="Profile"
-            >
-              <span className="text-sm font-medium">
-                {adminEmail?.[0]?.toUpperCase() ?? "A"}
-              </span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>
-              {adminEmail ?? "admin@example.com"}
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>Выйти</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <Card>
+    <main className="min-h-screen bg-muted/30">
+      <div className="mx-auto flex w-full max-w-7xl gap-6 px-6 py-6">
+        <aside className="hidden h-fit w-64 flex-col gap-6 rounded-xl border bg-background/80 p-4 shadow-sm lg:flex">
+          <div>
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Навигация
+            </p>
+            <h2 className="text-lg font-semibold">Админка</h2>
+            <p className="text-xs text-muted-foreground">
+              Управление загрузками
+            </p>
+          </div>
+          <div className="flex flex-col gap-1 text-sm">
+            <button className="flex items-center gap-2 rounded-md bg-muted px-3 py-2 text-foreground">
+              Обзор
+            </button>
+            <button className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+              Файлы
+            </button>
+            <button className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+              Загрузки
+            </button>
+            <button className="flex items-center gap-2 rounded-md px-3 py-2 text-muted-foreground transition hover:bg-muted hover:text-foreground">
+              Настройки
+            </button>
+          </div>
+          <div className="rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground">
+            Загружайте файлы и контролируйте доступность на сайте.
+          </div>
+        </aside>
+
+        <section className="flex-1 space-y-6">
+          <div className="flex flex-col gap-4 rounded-xl border bg-background/80 p-5 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Панель управления
+              </p>
+              <h1 className="text-2xl font-semibold">Админка</h1>
+              <p className="text-sm text-muted-foreground">
+                Управление загрузками и статусами.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="relative">
+                <Input
+                  placeholder="Поиск по файлам"
+                  className="h-9 w-56 pr-8"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+                {query ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="absolute right-1 top-1/2 -translate-y-1/2"
+                    onClick={() => setQuery("")}
+                    aria-label="Очистить"
+                  >
+                    ×
+                  </Button>
+                ) : null}
+              </div>
+              <Button variant="outline" onClick={() => fetchItems()}>
+                Обновить
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="h-10 w-10 rounded-full p-0"
+                    aria-label="Профиль"
+                  >
+                    <span className="text-sm font-medium">
+                      {adminEmail?.[0]?.toUpperCase() ?? "A"}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>
+                    {adminEmail ?? "admin@example.com"}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => setTheme(isDark ? "light" : "dark")}
+                    className="flex items-center justify-between"
+                  >
+                    <span>Темная тема</span>
+                    <span
+                      className={`inline-flex h-5 w-9 items-center rounded-full border transition ${
+                        isDark
+                          ? "border-neutral-600 bg-neutral-900"
+                          : "border-neutral-300 bg-neutral-200"
+                      }`}
+                    >
+                      <span
+                        className={`h-4 w-4 rounded-full bg-white shadow transition ${
+                          isDark ? "translate-x-4" : "translate-x-1"
+                        }`}
+                      />
+                    </span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>Выйти</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm text-muted-foreground">
+                  Всего файлов
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold">{stats.total}</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm text-muted-foreground">
+                  Видимые
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold">{stats.visible}</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm text-muted-foreground">
+                  Скрытые
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold">{stats.hidden}</p>
+              </CardContent>
+            </Card>
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-sm text-muted-foreground">
+                  Изображения
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold">{stats.images}</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Загрузки</CardTitle>
         </CardHeader>
         <CardContent>
           <div
-            className={`flex flex-col items-center justify-center gap-3 rounded-md border border-dashed p-8 text-center transition ${
-              dragActive ? "border-neutral-900" : "border-neutral-300"
+            className={`flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed bg-background/60 p-8 text-center transition ${
+              dragActive ? "border-foreground" : "border-border"
             }`}
             onDragOver={(event) => {
               event.preventDefault();
@@ -196,7 +363,7 @@ export default function AdminPage() {
             onDragLeave={() => setDragActive(false)}
             onDrop={handleDrop}
           >
-            <p className="text-sm text-neutral-600">
+            <p className="text-sm text-muted-foreground">
               Перетащите файлы сюда или выберите их для загрузки.
             </p>
             <Input
@@ -214,16 +381,32 @@ export default function AdminPage() {
           </div>
           {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
         </CardContent>
-      </Card>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Файлы ({rowCountLabel})</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle>Файлы ({rowCountLabel})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={filter} onValueChange={setFilter}>
+                <TabsList>
+                  <TabsTrigger value="all">
+                    Все ({stats.total})
+                  </TabsTrigger>
+                  <TabsTrigger value="visible">
+                    Видимые ({stats.visible})
+                  </TabsTrigger>
+                  <TabsTrigger value="hidden">
+                    Скрытые ({stats.hidden})
+                  </TabsTrigger>
+                  <TabsTrigger value="images">
+                    Изображения ({stats.images})
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
                 <TableHead>Превью</TableHead>
                 <TableHead>Название</TableHead>
                 <TableHead>Тип</TableHead>
@@ -233,12 +416,12 @@ export default function AdminPage() {
                 <TableHead className="text-right">Действия</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id}>
+              <TableBody>
+                {filteredItems.map((item) => (
+                  <TableRow key={item.id}>
                   <TableCell>
                     {Boolean(item.isImage) ? (
-                      <div className="h-8 w-8 overflow-hidden rounded border border-neutral-200">
+                      <div className="h-8 w-8 overflow-hidden rounded border border-border bg-background">
                         <img
                           alt={item.originalName}
                           src={`/api/files/${item.id}`}
@@ -246,7 +429,7 @@ export default function AdminPage() {
                         />
                       </div>
                     ) : (
-                      <div className="h-8 w-8 rounded border border-dashed border-neutral-200 bg-neutral-50" />
+                      <div className="h-8 w-8 rounded border border-dashed border-border bg-muted" />
                     )}
                   </TableCell>
                   <TableCell className="font-medium">
@@ -255,7 +438,7 @@ export default function AdminPage() {
                   <TableCell>{item.mimeType}</TableCell>
                   <TableCell>{formatBytes(item.sizeBytes)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-3 text-xs text-neutral-600">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
                         <svg
                           viewBox="0 0 24 24"
@@ -349,7 +532,9 @@ export default function AdminPage() {
             </TableBody>
           </Table>
         </CardContent>
-      </Card>
+          </Card>
+        </section>
+      </div>
     </main>
   );
 }

@@ -1,13 +1,11 @@
-import Database from "better-sqlite3";
-import { mkdirSync } from "node:fs";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
 import * as schema from "./schema";
 
-const dataDir = process.env.DATA_DIR ?? "./data";
-const dbPath = `${dataDir.replace(/\/$/, "")}/db.sqlite`;
+const connectionString =
+  process.env.DATABASE_URL ??
+  "postgres://postgres:postgres@localhost:5432/my_test";
 
-mkdirSync(dataDir, { recursive: true });
+const pool = new Pool({ connectionString });
 
-const sqlite = new Database(dbPath);
-
-export const db = drizzle(sqlite, { schema });
+export const db = drizzle(pool, { schema });

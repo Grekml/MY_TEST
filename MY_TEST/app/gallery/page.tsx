@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 import { useEffect, useState } from "react";
 import {
@@ -135,6 +136,7 @@ export default function GalleryPage() {
                   <div className="flex items-center justify-between text-xs text-neutral-600">
                     <button
                       type="button"
+                      data-testid={`like-${item.id}`}
                       className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs hover:bg-neutral-100 ${
                         votesMap[item.id] === "like"
                           ? "border-neutral-900"
@@ -160,6 +162,7 @@ export default function GalleryPage() {
                     </button>
                     <button
                       type="button"
+                      data-testid={`dislike-${item.id}`}
                       className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-xs hover:bg-neutral-100 ${
                         votesMap[item.id] === "dislike"
                           ? "border-neutral-900"

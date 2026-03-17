@@ -25,10 +25,7 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  db.update(files)
-    .set({ deletedAt: new Date() })
-    .where(eq(files.id, id))
-    .run();
+  await db.update(files).set({ deletedAt: new Date() }).where(eq(files.id, id));
 
   return NextResponse.json({ ok: true });
 }

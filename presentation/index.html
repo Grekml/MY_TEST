@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>THE NEXT LEVEL</title>
+    <style>
+      :root {
+        --bg-0: #151922;
+        --bg-1: #0f121a;
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.72);
+        --border: rgba(255, 255, 255, 0.12);
+        --glass: rgba(255, 255, 255, 0.06);
+        --shadow: rgba(0, 0, 0, 0.35);
+        --accent-0: #fbbf24;
+        --accent-1: #f59e0b;
+        --accent-2: rgba(255, 214, 0, 0.95);
+        --radius: 18px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        color: var(--text);
+        background: var(--bg-0);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .stage {
+        min-height: 100vh;
+        position: relative;
+        padding: 64px 24px;
+        overflow: hidden;
+      }
+
+      .stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background:
+          radial-gradient(900px 450px at 20% -10%, rgba(245, 211, 0, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 90% 0%, rgba(71, 85, 105, 0.20), transparent 62%),
+          radial-gradient(750px 420px at 55% 120%, rgba(245, 158, 11, 0.10), transparent 60%),
+          linear-gradient(180deg, rgba(15, 18, 26, 0.86), rgba(15, 18, 26, 0.86));
+        pointer-events: none;
+      }
+
+      .wrap {
+        position: relative;
+        z-index: 1;
+        max-width: 1024px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+      }
+
+      .hero {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      h1 {
+        margin: 0;
+        font-weight: 900;
+        letter-spacing: -0.035em;
+        text-transform: uppercase;
+        font-size: clamp(44px, 6.7vw, 86px);
+        line-height: 0.96;
+        background: linear-gradient(90deg, var(--accent-0), var(--accent-1));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .since {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        color: rgba(255, 211, 77, 0.98);
+        font-weight: 700;
+        user-select: none;
+      }
+
+      .since .label {
+        font-size: clamp(22px, 3.2vw, 42px);
+        font-weight: 300;
+        opacity: 0.95;
+        letter-spacing: 0.02em;
+      }
+
+      .since .value {
+        font-size: clamp(22px, 3.2vw, 42px);
+        font-weight: 300;
+      }
+
+      .projects-trigger {
+        appearance: none;
+        cursor: pointer;
+        border-radius: 999px;
+        border: 1px solid var(--accent-2);
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffd700;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        padding: 10px 22px;
+        min-width: 170px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+        transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      }
+
+      .projects-trigger:hover {
+        background: rgba(255, 255, 255, 0.24);
+        transform: translateY(-1px);
+        box-shadow: 0 10px 22px rgba(255, 214, 0, 0.35), 0 10px 28px rgba(0, 0, 0, 0.35);
+      }
+
+      .projects-trigger:focus-visible {
+        outline: 2px solid rgba(255, 214, 0, 0.95);
+        outline-offset: 3px;
+      }
+
+      .card {
+        border: 1px solid var(--border);
+        background: var(--glass);
+        border-radius: var(--radius);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+        overflow: hidden;
+      }
+
+      .card .head {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .card .title {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: -0.01em;
+      }
+
+      .card .body {
+        padding: 14px 16px;
+        color: var(--muted);
+      }
+
+      .section {
+        padding-top: 12px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      @media (max-width: 860px) {
+        .grid-3 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* Gratitude block */
+      .gratitude {
+        position: relative;
+        padding: 56px 0;
+        border-radius: 26px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.01));
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        overflow: hidden;
+      }
+
+      .gratitude::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        background:
+          radial-gradient(800px 260px at 15% 30%, rgba(245, 158, 11, 0.14), transparent 65%),
+          radial-gradient(780px 300px at 85% 15%, rgba(148, 163, 184, 0.12), transparent 68%),
+          radial-gradient(700px 320px at 45% 120%, rgba(245, 211, 0, 0.12), transparent 65%);
+        pointer-events: none;
+      }
+
+      .gratitude .inner {
+        position: relative;
+        z-index: 1;
+        max-width: 1024px;
+        margin: 0 auto;
+        padding: 0 18px;
+      }
+
+      .gratitude h2 {
+        margin: 0 0 10px;
+        font-size: 26px;
+        letter-spacing: -0.01em;
+      }
+
+      .gratitude p {
+        margin: 0 0 22px;
+        color: rgba(255, 255, 255, 0.78);
+        font-size: 18px;
+        line-height: 1.5;
+      }
+
+      .preview-tile {
+        position: relative;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(15, 18, 26, 0.48);
+        padding: 14px;
+        transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+      }
+
+      .preview-tile:hover {
+        transform: translateY(-2px);
+        border-color: rgba(255, 214, 0, 0.38);
+        background: rgba(15, 18, 26, 0.60);
+      }
+
+      .preview-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.92);
+        cursor: pointer;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        width: 100%;
+        text-align: left;
+        transition: border-color 160ms ease, background 160ms ease;
+      }
+
+      .preview-trigger:hover {
+        background: rgba(255, 255, 255, 0.10);
+      }
+
+      .preview-trigger:focus-visible {
+        outline: 2px solid rgba(255, 214, 0, 0.95);
+        outline-offset: 3px;
+      }
+
+      .preview-trigger .small {
+        display: block;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.68);
+        margin-top: 6px;
+        font-size: 13px;
+        line-height: 1.25;
+      }
+
+      .preview-pop {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        top: calc(100% + 10px);
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(10, 12, 18, 0.86);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 22px 56px rgba(0, 0, 0, 0.55);
+        opacity: 0;
+        transform: translateY(6px);
+        pointer-events: none;
+        transition: opacity 140ms ease, transform 140ms ease;
+        z-index: 50;
+      }
+
+      .preview-tile:hover .preview-pop,
+      .preview-tile:focus-within .preview-pop,
+      .preview-tile[data-open="true"] .preview-pop {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+
+      .shots {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .shot {
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+        aspect-ratio: 4 / 3;
+        background:
+          radial-gradient(160px 90px at 20% 35%, rgba(255, 214, 0, 0.22), transparent 60%),
+          radial-gradient(150px 90px at 85% 20%, rgba(148, 163, 184, 0.18), transparent 60%),
+          linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+        display: grid;
+        place-items: center;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .shot span {
+        display: block;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 12px;
+        line-height: 1.2;
+      }
+
+      /* Fullscreen projects overlay */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: none;
+      }
+
+      .overlay[data-open="true"] {
+        display: block;
+      }
+
+      .overlay .backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 18, 26, 0.86);
+      }
+
+      .overlay .panel {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 28px;
+      }
+
+      .overlay .dialog {
+        width: min(980px, 100%);
+        position: relative;
+      }
+
+      .overlay .close {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.92);
+        cursor: pointer;
+        transition: transform 160ms ease, background 160ms ease;
+      }
+
+      .overlay .close:hover {
+        background: rgba(255, 255, 255, 0.10);
+        transform: translateY(-1px);
+      }
+
+      .overlay .close:focus-visible {
+        outline: 2px solid rgba(255, 214, 0, 0.95);
+        outline-offset: 2px;
+      }
+
+      .overlay ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .overlay a {
+        display: block;
+        padding: 18px 18px;
+        text-align: center;
+        border-radius: 14px;
+        background: rgba(245, 211, 0, 0.14);
+        border: 1px solid rgba(255, 214, 0, 0.22);
+        color: rgba(255, 255, 255, 0.96);
+        text-decoration: none;
+        font-size: clamp(20px, 3.2vw, 34px);
+        font-weight: 500;
+        letter-spacing: -0.01em;
+        transform: translateZ(0);
+        transition: transform 180ms ease, background 180ms ease, box-shadow 180ms ease;
+      }
+
+      .overlay a:hover {
+        background: rgba(245, 211, 0, 0.45);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      }
+
+      .overlay a:focus-visible {
+        outline: 2px solid rgba(255, 214, 0, 0.95);
+        outline-offset: 3px;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .projects-trigger,
+        .overlay a,
+        .preview-tile,
+        .preview-pop {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <div class="wrap">
+        <section id="intro" class="hero" aria-label="Intro">
+          <h1 aria-label="THE NEXT LEVEL">THE NEXT LEVEL</h1>
+          <div class="since" role="timer" aria-label="Я в QTIM">
+            <span class="label">Я в QTIM</span>
+            <span class="value" id="sinceValue">0 days 00:00:00</span>
+          </div>
+
+          <button class="projects-trigger" id="projectsOpen" type="button" aria-haspopup="dialog" aria-expanded="false">
+            Projects
+          </button>
+        </section>
+
+        <section id="project-files" class="section" aria-label="ScanWow">
+          <div class="card">
+            <div class="head"><h2 class="title">ScanWow</h2></div>
+            <div class="body">Gallery, media and assets for the landing project.</div>
+          </div>
+        </section>
+
+        <section id="project-admin" class="section" aria-label="LinX">
+          <div class="card">
+            <div class="head"><h2 class="title">LinX</h2></div>
+            <div class="body">Administrative interfaces and workflows described here.</div>
+          </div>
+        </section>
+
+        <section id="project-docker" class="section" aria-label="Юркас">
+          <div class="card">
+            <div class="head"><h2 class="title">Юркас</h2></div>
+            <div class="body">Containerization and deployment notes.</div>
+          </div>
+        </section>
+
+        <section id="project-team" class="section" aria-label="Binary Options">
+          <div class="card">
+            <div class="head"><h2 class="title">Binary Options</h2></div>
+            <div class="body">Collaborative notes and feedback.</div>
+          </div>
+        </section>
+
+        <section id="project-b2box" class="section" aria-label="B2Box">
+          <div class="card">
+            <div class="head"><h2 class="title">B2Box</h2></div>
+            <div class="body">Project-specific documentation and notes for B2Box.</div>
+          </div>
+        </section>
+
+        <section class="gratitude" id="link-preview-demo-second" aria-label="Командная благодарность">
+          <div class="inner">
+            <h2>Командная благодарность</h2>
+            <p>
+              Наша команда выражает искреннюю признательность за качественную работу, высокий профессионализм и охват знаний,
+              которыми мы делимся друг с другом. Это не только результат индивидуальных усилий, но и синергия, которая
+              поднимает нас выше.
+            </p>
+
+            <div class="grid-3" aria-label="Previews">
+              <div class="preview-tile" data-preview>
+                <button class="preview-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">
+                  <span>
+                    Первая демонстрация
+                    <span class="small">Положительный пример превью проекта после завершения задачи</span>
+                  </span>
+                </button>
+                <div class="preview-pop" role="dialog" aria-label="Preview">
+                  <div class="shots">
+                    <div class="shot"><span>Согласование<br />placeholder</span></div>
+                    <div class="shot"><span>Качество<br />placeholder</span></div>
+                    <div class="shot"><span>Обмен опытом<br />placeholder</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-tile" data-preview>
+                <button class="preview-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">
+                  <span>
+                    Вдохновение и рост
+                    <span class="small">Показатели эффективности и стремление к экспериментам</span>
+                  </span>
+                </button>
+                <div class="preview-pop" role="dialog" aria-label="Preview">
+                  <div class="shots">
+                    <div class="shot"><span>Рост<br />placeholder</span></div>
+                    <div class="shot"><span>Идеи<br />placeholder</span></div>
+                    <div class="shot"><span>Сотрудничество<br />placeholder</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="preview-tile" data-preview>
+                <button class="preview-trigger" type="button" aria-haspopup="dialog" aria-expanded="false">
+                  <span>
+                    Обмен знаниями
+                    <span class="small">Поддержка коллег и совместное решение задач</span>
+                  </span>
+                </button>
+                <div class="preview-pop" role="dialog" aria-label="Preview">
+                  <div class="shots">
+                    <div class="shot"><span>Помощь<br />placeholder</span></div>
+                    <div class="shot"><span>Мастерство<br />placeholder</span></div>
+                    <div class="shot"><span>Обучение<br />placeholder</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-3" aria-label="Highlights">
+          <div class="card">
+            <div class="head"><h3 class="title" style="font-size: 18px">Разные типы файлов</h3></div>
+            <div class="body" style="font-size: 14px">Изображения, PDF и архивы в одной галерее с метаданными.</div>
+          </div>
+          <div class="card">
+            <div class="head"><h3 class="title" style="font-size: 18px">Быстрая админка</h3></div>
+            <div class="body" style="font-size: 14px">Мультизагрузка и скрытие/восстановление в один клик.</div>
+          </div>
+          <div class="card">
+            <div class="head"><h3 class="title" style="font-size: 18px">Docker-first</h3></div>
+            <div class="body" style="font-size: 14px">Локальный запуск с надежным хранением в volume.</div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <div class="overlay" id="projectsOverlay" data-open="false" aria-hidden="true">
+      <div class="backdrop" id="projectsBackdrop"></div>
+      <div class="panel">
+        <div class="dialog" role="dialog" aria-label="Projects fullscreen menu" aria-modal="true">
+          <button class="close" id="projectsClose" type="button" aria-label="Close">
+            &#x2715;
+          </button>
+          <ul aria-label="Projects">
+            <li><a href="#project-files" data-scroll>ScanWow</a></li>
+            <li><a href="#project-admin" data-scroll>LinX</a></li>
+            <li><a href="#project-docker" data-scroll>Юркас</a></li>
+            <li><a href="#project-team" data-scroll>Binary Options</a></li>
+            <li><a href="#project-b2box" data-scroll>B2Box</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        function pad2(n) {
+          return String(n).padStart(2, "0");
+        }
+
+        // Counter: interpret as local time components (matches original intent)
+        var targetStr = "2025-06-18T15:25:00";
+        var target = (function () {
+          try {
+            if (targetStr.indexOf("T") !== -1) {
+              var parts = targetStr.split("T");
+              var datePart = parts[0];
+              var timePart = parts[1] || "00:00:00";
+              var d = datePart.split("-").map(function (x) {
+                return parseInt(x, 10);
+              });
+              var t = timePart.split(":").map(function (x) {
+                return parseInt(x, 10);
+              });
+              return new Date(d[0], d[1] - 1, d[2], t[0] || 0, t[1] || 0, t[2] || 0).getTime();
+            }
+          } catch (e) {
+            // fall through
+          }
+          return new Date(targetStr).getTime();
+        })();
+
+        var sinceValue = document.getElementById("sinceValue");
+        function tick() {
+          var now = Date.now();
+          var elapsed = Math.max(0, now - target);
+          var msInSec = 1000;
+          var msInMin = msInSec * 60;
+          var msInHour = msInMin * 60;
+          var msInDay = msInHour * 24;
+          var days = Math.floor(elapsed / msInDay);
+          var hours = Math.floor((elapsed % msInDay) / msInHour);
+          var minutes = Math.floor((elapsed % msInHour) / msInMin);
+          var seconds = Math.floor((elapsed % msInMin) / msInSec);
+          sinceValue.textContent = days + " days " + pad2(hours) + ":" + pad2(minutes) + ":" + pad2(seconds);
+        }
+
+        tick();
+        setInterval(tick, 1000);
+
+        // Projects overlay
+        var overlay = document.getElementById("projectsOverlay");
+        var openBtn = document.getElementById("projectsOpen");
+        var closeBtn = document.getElementById("projectsClose");
+        var backdrop = document.getElementById("projectsBackdrop");
+        var lastFocus = null;
+
+        function setOverlay(open) {
+          overlay.dataset.open = open ? "true" : "false";
+          overlay.setAttribute("aria-hidden", open ? "false" : "true");
+          openBtn.setAttribute("aria-expanded", open ? "true" : "false");
+          document.body.style.overflow = open ? "hidden" : "";
+
+          if (open) {
+            lastFocus = document.activeElement;
+            window.setTimeout(function () {
+              closeBtn.focus();
+            }, 0);
+          } else if (lastFocus && typeof lastFocus.focus === "function") {
+            lastFocus.focus();
+            lastFocus = null;
+          }
+        }
+
+        openBtn.addEventListener("click", function () {
+          setOverlay(true);
+        });
+        closeBtn.addEventListener("click", function () {
+          setOverlay(false);
+        });
+        backdrop.addEventListener("click", function () {
+          setOverlay(false);
+        });
+
+        window.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && overlay.dataset.open === "true") {
+            setOverlay(false);
+          }
+        });
+
+        overlay.addEventListener("click", function (e) {
+          var t = e.target;
+          if (t && t.matches && t.matches("a[data-scroll]")) {
+            e.preventDefault();
+            var href = t.getAttribute("href") || "";
+            var id = href.replace(/^#/, "");
+            var el = document.getElementById(id);
+            if (el) {
+              el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+            setOverlay(false);
+          }
+        });
+
+        // Preview tiles: click-to-toggle (helps mobile). Hover/focus still works via CSS.
+        var tiles = Array.prototype.slice.call(document.querySelectorAll("[data-preview]"));
+        tiles.forEach(function (tile) {
+          var btn = tile.querySelector(".preview-trigger");
+          if (!btn) return;
+          btn.addEventListener("click", function () {
+            var open = tile.getAttribute("data-open") === "true";
+            tiles.forEach(function (t) {
+              t.setAttribute("data-open", "false");
+              var b = t.querySelector(".preview-trigger");
+              if (b) b.setAttribute("aria-expanded", "false");
+            });
+            tile.setAttribute("data-open", open ? "false" : "true");
+            btn.setAttribute("aria-expanded", open ? "false" : "true");
+          });
+        });
+
+        document.addEventListener("click", function (e) {
+          var targetEl = e.target;
+          var inside = false;
+          tiles.forEach(function (t) {
+            if (t.contains(targetEl)) inside = true;
+          });
+          if (!inside) {
+            tiles.forEach(function (t) {
+              t.setAttribute("data-open", "false");
+              var b = t.querySelector(".preview-trigger");
+              if (b) b.setAttribute("aria-expanded", "false");
+            });
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

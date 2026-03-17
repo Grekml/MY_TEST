@@ -93,13 +93,13 @@ export async function POST(request: Request) {
       storedPath,
       mimeType,
       sizeBytes: entry.size,
-      isImage,
+      isImage: isImage ? 1 : 0,
       createdAt: now,
     });
   }
 
   if (inserted.length) {
-    db.insert(files).values(inserted).run();
+    await db.insert(files).values(inserted);
   }
 
   return NextResponse.json({ items: inserted });

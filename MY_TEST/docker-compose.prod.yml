@@ -15,9 +15,22 @@ services:
       JWT_ACCESS_TTL_SECONDS: "900"
       JWT_REFRESH_TTL_SECONDS: "2592000"
       DATA_DIR: "/app/data"
+      DATABASE_URL: "postgres://postgres:postgres@db:5432/my_test"
     volumes:
       - app_data:/app/data
     command: ["sh", "-c", "npm run db:migrate && npm run start -- -H 0.0.0.0"]
+    depends_on:
+      - db
+
+  db:
+    image: supabase/postgres:15.1.0.117
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "my_test"
+      POSTGRES_USER: "postgres"
+    volumes:
+      - db_data:/var/lib/postgresql/data
 
 volumes:
   app_data:
+  db_data:

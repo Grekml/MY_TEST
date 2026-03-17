@@ -28,12 +28,12 @@ export async function POST(request: Request) {
   const refreshToken = await signRefreshToken(sessionId);
   const accessToken = await signAccessToken();
 
-  db.insert(adminSessions).values({
+  await db.insert(adminSessions).values({
     id: sessionId,
     refreshTokenHash: hashRefreshToken(refreshToken),
     createdAt: now,
     expiresAt: new Date(now.getTime() + tokenConfig.refreshTtlSeconds() * 1000),
-  }).run();
+  });
 
   const response = NextResponse.json({ ok: true });
   response.cookies.set(cookieConfig.accessName, accessToken, {

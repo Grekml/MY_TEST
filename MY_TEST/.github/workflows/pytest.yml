@@ -15,5 +15,23 @@ jobs:
         if [ -f requirements.txt ]; then python -m pip install -r requirements.txt; fi
         if [ -f requirements-dev.txt ]; then python -m pip install -r requirements-dev.txt; fi
         python -m pip install pytest
+        python -m playwright install --with-deps chromium
+    - name: Start app with Docker
+      run: docker compose up --build -d
+    - name: Wait for app
+      run: |
+        for i in {1..30}; do
+          if curl -sSf http://localhost:3000/gallery >/dev/null; then
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "App did not start" >&2
+        docker compose logs --tail 200
+        exit 1
     - name: Run tests
+      env:
+        BASE_URL: http://localhost:3000
+        ADMIN_EMAIL: admin@example.com
+        ADMIN_PASSWORD: adminpass
       run: pytest tests/ -v
