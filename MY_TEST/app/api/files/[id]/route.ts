@@ -12,11 +12,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const record = db
-    .select()
-    .from(files)
-    .where(eq(files.id, id))
-    .get();
+  const records = await db.select().from(files).where(eq(files.id, id));
+  const record = records[0];
 
   if (!record || record.deletedAt) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

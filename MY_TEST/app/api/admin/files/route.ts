@@ -21,11 +21,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const rows = db
-    .select()
-    .from(files)
-    .orderBy(desc(files.createdAt))
-    .all();
+  const rows = await db.select().from(files).orderBy(desc(files.createdAt));
 
   return NextResponse.json({ items: rows });
 }

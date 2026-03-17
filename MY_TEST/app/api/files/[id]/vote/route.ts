@@ -35,11 +35,11 @@ export async function POST(
   const { likeDelta, dislikeDelta } = toDelta(prevVote, nextVote);
 
   if (likeDelta === 0 && dislikeDelta === 0) {
-    const record = db
+    const records = await db
       .select({ likeCount: files.likeCount, dislikeCount: files.dislikeCount })
       .from(files)
-      .where(eq(files.id, id))
-      .get();
+      .where(eq(files.id, id));
+    const record = records[0];
 
     return NextResponse.json({
       likeCount: record?.likeCount ?? 0,
@@ -47,24 +47,24 @@ export async function POST(
     });
   }
 
-  const result = db
+  const updated = await db
     .update(files)
     .set({
-      likeCount: sql`max(${files.likeCount} + ${likeDelta}, 0)`,
-      dislikeCount: sql`max(${files.dislikeCount} + ${dislikeDelta}, 0)`,
+      likeCount: sql`greatest(${files.likeCount} + ${likeDelta}, 0)`,
+      dislikeCount: sql`greatest(${files.dislikeCount} + ${dislikeDelta}, 0)`,
     })
     .where(and(eq(files.id, id), isNull(files.deletedAt)))
-    .run();
+    .returning({ id: files.id });
 
-  if (!result.changes) {
+  if (updated.length === 0) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const record = db
+  const records = await db
     .select({ likeCount: files.likeCount, dislikeCount: files.dislikeCount })
     .from(files)
-    .where(eq(files.id, id))
-    .get();
+    .where(eq(files.id, id));
+  const record = records[0];
 
   return NextResponse.json({
     likeCount: record?.likeCount ?? 0,

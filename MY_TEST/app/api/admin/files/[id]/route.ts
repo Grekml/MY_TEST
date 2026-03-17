@@ -29,11 +29,8 @@ export async function GET(
   }
 
   const { id } = await params;
-  const record = db
-    .select()
-    .from(files)
-    .where(eq(files.id, id))
-    .get();
+  const records = await db.select().from(files).where(eq(files.id, id));
+  const record = records[0];
 
   if (!record) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -60,10 +57,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  db.update(files)
-    .set({ title, description })
-    .where(eq(files.id, id))
-    .run();
+  await db.update(files).set({ title, description }).where(eq(files.id, id));
 
   return NextResponse.json({ ok: true });
 }

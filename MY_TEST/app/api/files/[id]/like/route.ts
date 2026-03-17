@@ -11,21 +11,21 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const result = db
+  const updated = await db
     .update(files)
     .set({ likeCount: sql`${files.likeCount} + 1` })
     .where(and(eq(files.id, id), isNull(files.deletedAt)))
-    .run();
+    .returning({ id: files.id });
 
-  if (!result.changes) {
+  if (updated.length === 0) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const record = db
+  const records = await db
     .select({ likeCount: files.likeCount, dislikeCount: files.dislikeCount })
     .from(files)
-    .where(eq(files.id, id))
-    .get();
+    .where(eq(files.id, id));
+  const record = records[0];
 
   return NextResponse.json({
     likeCount: record?.likeCount ?? 0,

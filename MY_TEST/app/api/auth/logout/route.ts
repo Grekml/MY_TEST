@@ -16,10 +16,10 @@ export async function POST() {
     try {
       const payload = (await verifyRefreshToken(refreshToken)) as { sid?: string };
       if (payload.sid) {
-        db.update(adminSessions)
+        await db
+          .update(adminSessions)
           .set({ revokedAt: new Date() })
-          .where(eq(adminSessions.id, payload.sid))
-          .run();
+          .where(eq(adminSessions.id, payload.sid));
       }
     } catch {
       // ignore invalid token on logout

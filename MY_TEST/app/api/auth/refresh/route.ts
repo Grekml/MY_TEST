@@ -36,11 +36,11 @@ export async function POST() {
     return NextResponse.json({ error: "Invalid refresh token" }, { status: 401 });
   }
 
-  const session = db
+  const sessions = await db
     .select()
     .from(adminSessions)
-    .where(eq(adminSessions.id, sessionId))
-    .get();
+    .where(eq(adminSessions.id, sessionId));
+  const session = sessions[0];
 
   const now = new Date();
   if (
@@ -52,21 +52,21 @@ export async function POST() {
     return NextResponse.json({ error: "Refresh token expired" }, { status: 401 });
   }
 
-  db.update(adminSessions)
+  await db
+    .update(adminSessions)
     .set({ revokedAt: now, lastUsedAt: now })
-    .where(eq(adminSessions.id, sessionId))
-    .run();
+    .where(eq(adminSessions.id, sessionId));
 
   const newSessionId = crypto.randomUUID();
   const newRefreshToken = await signRefreshToken(newSessionId);
   const newAccessToken = await signAccessToken();
 
-  db.insert(adminSessions).values({
+  await db.insert(adminSessions).values({
     id: newSessionId,
     refreshTokenHash: hashRefreshToken(newRefreshToken),
     createdAt: now,
     expiresAt: new Date(now.getTime() + tokenConfig.refreshTtlSeconds() * 1000),
-  }).run();
+  });
 
   const response = NextResponse.json({ ok: true });
   response.cookies.set(cookieConfig.accessName, newAccessToken, {

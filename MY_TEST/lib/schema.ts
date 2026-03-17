@@ -1,15 +1,15 @@
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
-export const adminSessions = sqliteTable("admin_sessions", {
+export const adminSessions = pgTable("admin_sessions", {
   id: text("id").primaryKey(),
   refreshTokenHash: text("refresh_token_hash").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
-  revokedAt: integer("revoked_at", { mode: "timestamp_ms" }),
-  lastUsedAt: integer("last_used_at", { mode: "timestamp_ms" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  revokedAt: timestamp("revoked_at", { withTimezone: true }),
+  lastUsedAt: timestamp("last_used_at", { withTimezone: true }),
 });
 
-export const files = sqliteTable("files", {
+export const files = pgTable("files", {
   id: text("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description").notNull(),
@@ -17,9 +17,9 @@ export const files = sqliteTable("files", {
   storedPath: text("stored_path").notNull(),
   mimeType: text("mime_type").notNull(),
   sizeBytes: integer("size_bytes").notNull(),
-  isImage: integer("is_image", { mode: "boolean" }).notNull(),
+  isImage: integer("is_image").notNull(),
   likeCount: integer("like_count").notNull().default(0),
   dislikeCount: integer("dislike_count").notNull().default(0),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-  deletedAt: integer("deleted_at", { mode: "timestamp_ms" }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull(),
+  deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });

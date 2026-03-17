@@ -14,11 +14,54 @@ services:
       JWT_ACCESS_TTL_SECONDS: "900"
       JWT_REFRESH_TTL_SECONDS: "2592000"
       DATA_DIR: "/app/data"
+      DATABASE_URL: "postgres://postgres:postgres@db:5432/my_test"
     volumes:
       - .:/app
-      - /app/node_modules
+      - node_modules:/app/node_modules
       - app_data:/app/data
     command: ["sh", "-c", "mkdir -p /app/data/uploads && npm run db:migrate && npm run dev -- --hostname 0.0.0.0"]
+    depends_on:
+      - db
+
+  db:
+    image: supabase/postgres:15.1.0.117
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "my_test"
+      POSTGRES_USER: "postgres"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  meta:
+    image: supabase/postgres-meta:v0.80.0
+    environment:
+      PG_META_DB_HOST: "db"
+      PG_META_DB_PORT: "5432"
+      PG_META_DB_NAME: "my_test"
+      PG_META_DB_USER: "postgres"
+      PG_META_DB_PASSWORD: "postgres"
+      PG_META_PORT: "8080"
+    depends_on:
+      - db
+
+  studio:
+    image: supabase/studio:latest
+    ports:
+      - "54323:3000"
+    environment:
+      STUDIO_PG_META_URL: "http://meta:8080"
+      SUPABASE_URL: "http://localhost:3000"
+      SUPABASE_PUBLIC_URL: "http://localhost:3000"
+      SUPABASE_ANON_KEY: "local-anon-key"
+      SUPABASE_SERVICE_KEY: "local-service-key"
+      STUDIO_DEFAULT_ORGANIZATION: "local"
+      STUDIO_DEFAULT_PROJECT: "my_test"
+    depends_on:
+      - meta
 
 volumes:
+  node_modules:
   app_data:
+  db_data:

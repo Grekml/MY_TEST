@@ -10,13 +10,12 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const limit = Number(searchParams.get("limit") ?? "50");
 
-  const rows = db
+  const rows = await db
     .select()
     .from(files)
     .where(isNull(files.deletedAt))
     .orderBy(desc(files.createdAt))
-    .limit(Number.isFinite(limit) ? Math.min(limit, 200) : 50)
-    .all();
+    .limit(Number.isFinite(limit) ? Math.min(limit, 200) : 50);
 
   return NextResponse.json({ items: rows });
 }

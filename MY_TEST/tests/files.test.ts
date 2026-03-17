@@ -1,15 +1,18 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import { isNull } from "drizzle-orm";
+import { newDb } from "pg-mem";
 import { describe, expect, it } from "vitest";
-import { files } from "../lib/schema";
 
 describe("files metadata", () => {
-  it("filters out soft-deleted files", () => {
-    const sqlite = new Database(":memory:");
-    sqlite.exec(`
+  it("filters out soft-deleted files", async () => {
+    const mem = newDb();
+    const now = new Date();
+    const db = mem.public;
+    const nowIso = now.toISOString();
+
+    db.none(`
       CREATE TABLE files (
         id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
         original_name TEXT NOT NULL,
         stored_path TEXT NOT NULL,
         mime_type TEXT NOT NULL,
@@ -17,42 +20,31 @@ describe("files metadata", () => {
         is_image INTEGER NOT NULL,
         like_count INTEGER NOT NULL DEFAULT 0,
         dislike_count INTEGER NOT NULL DEFAULT 0,
-        created_at INTEGER NOT NULL,
-        deleted_at INTEGER
+        created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+        deleted_at TIMESTAMP WITH TIME ZONE
       );
     `);
 
-    const db = drizzle(sqlite, { schema: { files } });
-    const now = new Date();
+    db.none(`
+      INSERT INTO files (
+        id,
+        title,
+        description,
+        original_name,
+        stored_path,
+        mime_type,
+        size_bytes,
+        is_image,
+        created_at,
+        deleted_at
+      ) VALUES
+        ('file-1', 'a.txt', 'a.txt', 'a.txt', '/tmp/a.txt', 'text/plain', 10, 0, '${nowIso}', NULL),
+        ('file-2', 'b.txt', 'b.txt', 'b.txt', '/tmp/b.txt', 'text/plain', 20, 0, '${nowIso}', '${nowIso}');
+    `);
 
-    db.insert(files).values([
-      {
-        id: "file-1",
-        originalName: "a.txt",
-        storedPath: "/tmp/a.txt",
-        mimeType: "text/plain",
-        sizeBytes: 10,
-        isImage: false,
-        createdAt: now,
-        deletedAt: null,
-      },
-      {
-        id: "file-2",
-        originalName: "b.txt",
-        storedPath: "/tmp/b.txt",
-        mimeType: "text/plain",
-        sizeBytes: 20,
-        isImage: false,
-        createdAt: now,
-        deletedAt: new Date(now.getTime()),
-      },
-    ]).run();
-
-    const visible = db
-      .select()
-      .from(files)
-      .where(isNull(files.deletedAt))
-      .all();
+    const visible = db.many(
+      "SELECT id FROM files WHERE deleted_at IS NULL ORDER BY id"
+    );
 
     expect(visible).toHaveLength(1);
     expect(visible[0]?.id).toBe("file-1");
