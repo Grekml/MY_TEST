@@ -35,12 +35,15 @@ export default async function ProjectDetailsPage({ params }: Props) {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
             <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{project.title}</h1>
-            <div className="flex flex-wrap gap-2 text-xs text-white/75">
-              <span className="rounded-md border border-white/20 bg-white/5 px-2 py-1">Что я тестировал: {testedItems.length}</span>
-              {bugsItems.length > 0 ? (
-                <span className="rounded-md border border-white/20 bg-white/5 px-2 py-1">Проблемы: {bugsItems.length}</span>
-              ) : null}
-            </div>
+            {project.cardMetrics && project.cardMetrics.length > 0 ? (
+              <div className="flex flex-wrap gap-2 text-xs text-white/75">
+                {project.cardMetrics.slice(0, 2).map((metric) => (
+                  <span key={metric} className="rounded-md border border-white/20 bg-white/5 px-2 py-1">
+                    {metric}
+                  </span>
+                ))}
+              </div>
+            ) : null}
           </div>
           <Link
             href="/#projects"
