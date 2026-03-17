@@ -65,12 +65,12 @@ export default function Home() {
             {PROJECTS.map((project) => (
               <Card
                 key={project.slug}
-                className="relative flex h-[236px] flex-col gap-1 border border-white/10 bg-white/5 py-2 text-white shadow-lg transition hover:border-amber-400/60"
+                className="flex h-auto flex-col gap-1 border border-white/10 bg-white/5 py-2 text-white shadow-lg transition hover:border-amber-400/60 md:relative md:h-[236px]"
               >
                 <CardHeader className="px-4 py-1.5">
                   <CardTitle className="text-xl">{project.title}</CardTitle>
                 </CardHeader>
-                <CardContent className="px-4 pb-10 pt-1">
+                <CardContent className="px-4 pb-2 pt-1 md:pb-10">
                   {project.cardMetrics && project.cardMetrics.length > 0 ? (
                     <div className="mb-2 flex flex-wrap gap-1.5">
                       {project.cardMetrics.slice(0, 2).map((metric) => (
@@ -86,14 +86,14 @@ export default function Home() {
                   <p
                     className={
                       project.cardMetrics && project.cardMetrics.length > 0
-                        ? "text-sm leading-relaxed text-white/80 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:3] [-webkit-box-orient:vertical]"
-                        : "text-sm leading-relaxed text-white/80 overflow-hidden [display:-webkit-box] [-webkit-line-clamp:5] [-webkit-box-orient:vertical]"
+                        ? "text-sm leading-relaxed text-white/80 md:overflow-hidden md:[display:-webkit-box] md:[-webkit-line-clamp:3] md:[-webkit-box-orient:vertical]"
+                        : "text-sm leading-relaxed text-white/80 md:overflow-hidden md:[display:-webkit-box] md:[-webkit-line-clamp:5] md:[-webkit-box-orient:vertical]"
                     }
                   >
                     {project.short}
                   </p>
                 </CardContent>
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
+                <div className="mt-3 flex justify-center px-4 pb-2 md:absolute md:bottom-3 md:left-1/2 md:mt-0 md:-translate-x-1/2 md:px-0 md:pb-0">
                   <Link
                     href={`/projects/${project.slug}`}
                     className="inline-flex items-center rounded-full border border-amber-400/70 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-300 transition hover:bg-amber-500/20"
