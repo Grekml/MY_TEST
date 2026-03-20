@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const TOOL_HIGHLIGHTS = [
   "Collection Runner",
@@ -53,7 +53,8 @@ export function SkillTrackCard({
   disableHighlight = false,
 }: SkillTrackCardProps) {
   const scrollRef = useRef<HTMLUListElement | null>(null);
-  const [thumb, setThumb] = useState({ height: 28, top: 0, visible: false });
+  const thumbRef = useRef<HTMLSpanElement | null>(null);
+  const rafRef = useRef<number | null>(null);
 
   const renderToolHighlights = (text: string, keyPrefix: string) =>
     text.split(TOOL_HIGHLIGHT_RE).map((chunk, index) => {
@@ -70,13 +71,19 @@ export function SkillTrackCard({
 
   const updateThumb = () => {
     const el = scrollRef.current;
-    if (!el) {
+    const thumbEl = thumbRef.current;
+
+    rafRef.current = null;
+
+    if (!el || !thumbEl) {
       return;
     }
 
     const { scrollTop, scrollHeight, clientHeight } = el;
     if (scrollHeight <= clientHeight + 1) {
-      setThumb({ height: 0, top: 0, visible: false });
+      thumbEl.style.opacity = "0";
+      thumbEl.style.height = "0px";
+      thumbEl.style.transform = "translateY(0px)";
       return;
     }
 
@@ -85,20 +92,33 @@ export function SkillTrackCard({
     const height = Math.max(minThumb, Math.round(clientHeight * ratio));
     const maxTop = Math.max(0, clientHeight - height);
     const top = Math.round((scrollTop / (scrollHeight - clientHeight)) * maxTop);
-    setThumb({ height, top, visible: true });
+    thumbEl.style.opacity = "1";
+    thumbEl.style.height = `${height}px`;
+    thumbEl.style.transform = `translateY(${top}px)`;
+  };
+
+  const scheduleThumbUpdate = () => {
+    if (rafRef.current !== null) {
+      return;
+    }
+
+    rafRef.current = requestAnimationFrame(updateThumb);
   };
 
   useEffect(() => {
-    const id = requestAnimationFrame(updateThumb);
-    const onResize = () => updateThumb();
+    scheduleThumbUpdate();
+    const onResize = () => scheduleThumbUpdate();
 
     window.addEventListener("resize", onResize);
 
     return () => {
-      cancelAnimationFrame(id);
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+
       window.removeEventListener("resize", onResize);
     };
-  }, [items.length]);
+  }, [items]);
 
   return (
     <article className="qa-panel-soft qa-skill-card rounded-2xl p-5">
@@ -106,7 +126,7 @@ export function SkillTrackCard({
       <div className="qa-skill-scroll-wrap mt-3">
         <ul
           ref={scrollRef}
-          onScroll={updateThumb}
+          onScroll={scheduleThumbUpdate}
           className="qa-muted qa-skill-list qa-skill-scroll qa-native-scrollbar-hide space-y-3 text-sm leading-relaxed"
         >
           {items.map((item, index) => (
@@ -116,12 +136,7 @@ export function SkillTrackCard({
           ))}
         </ul>
         <div className="qa-mobile-scroll-track" aria-hidden="true">
-          {thumb.visible ? (
-            <span
-              className="qa-mobile-scroll-thumb"
-              style={{ height: `${thumb.height}px`, transform: `translateY(${thumb.top}px)` }}
-            />
-          ) : null}
+          <span ref={thumbRef} className="qa-mobile-scroll-thumb" />
         </div>
       </div>
     </article>

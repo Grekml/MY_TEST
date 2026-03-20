@@ -9,6 +9,8 @@
   --qa-brand: #cd0402;
   --qa-brand-soft: #efb3aa;
   --qa-display-font: var(--font-display), var(--font-body), sans-serif;
+  --qa-skill-scroll-track: color-mix(in oklab, var(--qa-surface-soft) 82%, white);
+  --qa-skill-scroll-thumb: color-mix(in oklab, var(--qa-brand-soft) 76%, var(--qa-border));
 }
 
 .qa-home {
@@ -350,13 +352,11 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  width: calc(100% + 1rem);
-  margin-right: -1rem;
-  padding-right: 1.35rem;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  padding-right: 0.5rem;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--qa-skill-scroll-thumb) var(--qa-skill-scroll-track);
 }
 
 .qa-skill-scroll-wrap {
@@ -365,7 +365,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  padding-right: 0.7rem;
+  padding-right: 0;
 }
 
 .qa-skill-scroll-wrap::after {
@@ -384,42 +384,76 @@
 }
 
 .qa-native-scrollbar-hide {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  scrollbar-width: auto;
+  -ms-overflow-style: auto;
 }
 
 .qa-native-scrollbar-hide::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-  display: none;
+  width: 0.72rem;
+}
+
+.qa-skill-scroll::-webkit-scrollbar-track {
+  background: var(--qa-skill-scroll-track);
+  border-radius: 999px;
+}
+
+.qa-skill-scroll::-webkit-scrollbar-thumb {
+  background: var(--qa-skill-scroll-thumb);
+  border-radius: 999px;
 }
 
 .qa-mobile-scroll-track {
   position: absolute;
   top: 0;
-  right: 0.15rem;
+  right: 0;
   bottom: 0.25rem;
   width: 0.72rem;
   border-radius: 999px;
-  background: color-mix(in oklab, var(--qa-brand-soft) 35%, white);
-  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--qa-brand) 15%, var(--qa-border));
+  background: var(--qa-skill-scroll-track);
   pointer-events: none;
   z-index: 2;
+  display: none;
 }
 
 .qa-mobile-scroll-thumb {
   position: absolute;
-  left: 0.07rem;
-  width: calc(100% - 0.14rem);
+  left: 0;
+  width: 100%;
+  top: 0;
+  height: 0;
   border-radius: 999px;
-  background: linear-gradient(180deg, color-mix(in oklab, var(--qa-brand-soft) 50%, white) 0%, color-mix(in oklab, var(--qa-brand) 78%, #991b1b) 100%);
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--qa-brand) 32%, transparent);
-  transition: transform 80ms linear;
+  background: var(--qa-skill-scroll-thumb);
+  opacity: 0;
 }
 
 @media (max-width: 1024px) {
   .qa-skill-card {
     min-height: 30rem;
     max-height: 30rem;
+  }
+
+  .qa-native-scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .qa-native-scrollbar-hide::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  .qa-skill-scroll {
+    width: calc(100% + 1rem);
+    margin-right: -1rem;
+    padding-right: 1.35rem;
+  }
+
+  .qa-skill-scroll-wrap {
+    padding-right: 0.7rem;
+  }
+
+  .qa-mobile-scroll-track {
+    display: block;
   }
 }
