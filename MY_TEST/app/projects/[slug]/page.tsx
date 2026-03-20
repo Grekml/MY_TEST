@@ -1,7 +1,23 @@
 import Link from "next/link";
+import { Martian_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getProjectBySlug, PROJECTS } from "@/lib/project-content";
+import "../../qa-promo.css";
+
+const bodyFont = Martian_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-body",
+  weight: ["400", "500", "600"],
+});
+
+const displayFont = localFont({
+  src: "../../../public/fonts/rubik-one-cyrillic.woff2",
+  variable: "--font-display",
+  display: "swap",
+});
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -25,47 +41,48 @@ export default async function ProjectDetailsPage({ params }: Props) {
   const contributionItems = project.contribution ?? [];
 
   return (
-    <main className="relative min-h-screen bg-[#0f121a] px-6 py-12 text-white">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-80"
-        style={{ background: "radial-gradient(1200px 600px at 80% -10%, rgba(245, 158, 11, 0.09), transparent 55%)" }}
-        aria-hidden="true"
-      />
+    <main
+      className={`${bodyFont.variable} ${displayFont.variable} qa-home relative min-h-screen overflow-hidden overflow-x-hidden px-6 py-12`}
+      data-homepage="qa-promo"
+    >
+      <div className="qa-grid-overlay absolute inset-0" aria-hidden="true" />
       <div className="relative z-10 mx-auto max-w-6xl space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{project.title}</h1>
-            {project.cardMetrics && project.cardMetrics.length > 0 ? (
-              <div className="flex flex-wrap gap-2 text-xs text-white/75">
-                {project.cardMetrics.slice(0, 2).map((metric) => (
-                  <span key={metric} className="rounded-md border border-white/20 bg-white/5 px-2 py-1">
-                    {metric}
-                  </span>
-                ))}
-              </div>
-            ) : null}
+        <div className="qa-panel rounded-[28px] p-6 sm:p-8">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="space-y-2">
+              <h1 className="qa-display text-3xl tracking-tight md:text-4xl">{project.title}</h1>
+              {project.cardMetrics && project.cardMetrics.length > 0 ? (
+                <div className="qa-muted flex flex-wrap gap-2 text-xs">
+                  {project.cardMetrics.slice(0, 2).map((metric) => (
+                    <span key={metric} className="qa-chip rounded-md px-2 py-1">
+                      {metric}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+            <Link
+              href="/#projects"
+              className="qa-btn-secondary inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold transition"
+            >
+              Назад
+            </Link>
           </div>
-          <Link
-            href="/#projects"
-            className="inline-flex items-center rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm text-white/90 transition hover:bg-white/10"
-          >
-            Назад
-          </Link>
+
+          {detailsIntro.trim().length > 0 ? (
+            <Card className="qa-panel-soft mt-5 border-none text-inherit shadow-none">
+              <CardContent className="qa-muted px-5 py-4 md:text-[15px]">{detailsIntro}</CardContent>
+            </Card>
+          ) : null}
         </div>
 
-        {detailsIntro.trim().length > 0 ? (
-          <Card className="border border-white/10 bg-white/5 text-white shadow-lg">
-            <CardContent className="px-5 py-4 text-white/85 md:text-[15px]">{detailsIntro}</CardContent>
-          </Card>
-        ) : null}
-
         <section className="grid gap-5 lg:grid-cols-2">
-          <Card className="border border-white/10 bg-white/5 text-white shadow-lg">
+          <Card className="qa-panel-soft border-none text-inherit shadow-none">
             <CardHeader className="px-5 pb-0 pt-4">
-              <CardTitle className="text-2xl">Что я тестировал</CardTitle>
+              <CardTitle className="qa-display text-2xl">Что я тестировал</CardTitle>
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-3">
-              <ul className="list-disc space-y-3 pl-5 text-white/85 marker:text-white/60">
+              <ul className="qa-muted list-disc space-y-3 pl-5 marker:text-[color:var(--qa-ink-muted)]">
                 {testedItems.map((item) => (
                   <li key={item} className="leading-relaxed">{item}</li>
                 ))}
@@ -74,12 +91,12 @@ export default async function ProjectDetailsPage({ params }: Props) {
           </Card>
 
           {bugsItems.length > 0 ? (
-            <Card className="border border-white/10 bg-white/5 text-white shadow-lg">
+            <Card className="qa-panel-soft border-none text-inherit shadow-none">
               <CardHeader className="px-5 pb-0 pt-4">
-                <CardTitle className="text-2xl">Какие значимые проблемы находил</CardTitle>
+                <CardTitle className="qa-display text-2xl">Какие значимые проблемы находил</CardTitle>
               </CardHeader>
               <CardContent className="px-5 pb-5 pt-3">
-                <ul className="list-disc space-y-3 pl-5 text-white/85 marker:text-white/60">
+                <ul className="qa-muted list-disc space-y-3 pl-5 marker:text-[color:var(--qa-ink-muted)]">
                   {bugsItems.map((item) => (
                     <li key={item} className="leading-relaxed">{item}</li>
                   ))}
@@ -89,12 +106,12 @@ export default async function ProjectDetailsPage({ params }: Props) {
           ) : null}
 
           {contributionItems.length > 0 ? (
-            <Card className="border border-white/10 bg-white/5 text-white shadow-lg lg:col-span-2">
+            <Card className="qa-panel border-none text-inherit shadow-none lg:col-span-2">
               <CardHeader className="px-5 pb-0 pt-4">
-                <CardTitle className="text-2xl">Мой вклад</CardTitle>
+                <CardTitle className="qa-display text-2xl">Мой вклад</CardTitle>
               </CardHeader>
               <CardContent className="px-5 pb-5 pt-3">
-                <ul className="list-disc space-y-3 pl-5 text-white/85 marker:text-white/60">
+                <ul className="qa-muted list-disc space-y-3 pl-5 marker:text-[color:var(--qa-ink-muted)]">
                   {contributionItems.map((item) => (
                     <li key={item} className="leading-relaxed">{item}</li>
                   ))}

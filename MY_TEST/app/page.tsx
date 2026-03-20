@@ -1,134 +1,384 @@
 import Link from "next/link";
-import RealtimeSinceCounter from "@/components/ui/realtime-since-counter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PROJECTS } from "@/lib/project-content";
+import type { Metadata } from "next";
+import { Martian_Mono } from "next/font/google";
+import localFont from "next/font/local";
+import {
+  HomeSectionLabel,
+} from "@/components/home/primitives";
+import { HomeReveal } from "@/components/home/reveal";
+import { MiniChart } from "@/components/home/MiniChart";
+import { QA_PROMOTION_CONTENT } from "@/lib/qa-promotion-content";
+import "./qa-promo.css";
+
+const TOOL_HIGHLIGHTS = [
+  "Collection Runner",
+  "Device Toolbar",
+  "Copy as cURL",
+  "Android Studio",
+  "PerfectPixel",
+  "Throttling",
+  "Application",
+  "Perplexity",
+  "Postman",
+  "Swagger",
+  "DevTools",
+  "Elements",
+  "Console",
+  "Network",
+  "Sources",
+  "Override",
+  "RabbitMQ",
+  "GitLab",
+  "CI/CD",
+  "Portainer",
+  "DataGrip",
+  "Charles",
+  "Cursor",
+  "Photoshop",
+  "Figma",
+  "vibe coding",
+].sort((a, b) => b.length - a.length);
+
+const TOOL_HIGHLIGHT_SET = new Set(TOOL_HIGHLIGHTS.map((tool) => tool.toLowerCase()));
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const TOOL_HIGHLIGHT_RE = new RegExp(
+  `(${TOOL_HIGHLIGHTS.map((tool) => escapeRegExp(tool)).join("|")})`,
+  "gi",
+);
+
+const renderToolHighlights = (text: string, keyPrefix: string) =>
+  text.split(TOOL_HIGHLIGHT_RE).map((chunk, index) => {
+    if (TOOL_HIGHLIGHT_SET.has(chunk.toLowerCase())) {
+      return (
+        <span key={`${keyPrefix}-${index}`} className="qa-tool-mark">
+          {chunk}
+        </span>
+      );
+    }
+
+    return <span key={`${keyPrefix}-${index}`}>{chunk}</span>;
+  });
+
+const bodyFont = Martian_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-body",
+  weight: ["400", "500", "600"],
+});
+
+const displayFont = localFont({
+  src: "../public/fonts/rubik-one-cyrillic.woff2",
+  variable: "--font-display",
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "QA-промо: витрина качества релизов",
+  description: "Промо-витрина QA-вклада: цифры, доказательства и проекты",
+};
 
 export default function Home() {
+  const {
+    heroStats,
+    trendSeries,
+    projectProof,
+    skillTracks,
+    closingSummary,
+  } = QA_PROMOTION_CONTENT;
+
+  const monthIndexByName: Record<string, number> = {
+    январь: 0,
+    февраль: 1,
+    март: 2,
+    апрель: 3,
+    май: 4,
+    июнь: 5,
+    июль: 6,
+    август: 7,
+    сентябрь: 8,
+    октябрь: 9,
+    ноябрь: 10,
+    декабрь: 11,
+  };
+
+  const parsePeriod = (period: string): { year: number; monthIndex: number } | null => {
+    const [monthName, yearText] = period.toLowerCase().split(" ");
+    const monthIndex = monthIndexByName[monthName];
+    const year = Number(yearText);
+
+    if (monthIndex === undefined || !Number.isFinite(year)) {
+      return null;
+    }
+
+    return { year, monthIndex };
+  };
+
+  const trendStartIndex = trendSeries.findIndex((point) => point.period === "июнь 2025");
+  const trendFromJoinDate =
+    trendStartIndex >= 0 ? trendSeries.slice(trendStartIndex) : trendSeries;
+
+  const now = new Date();
+  const currentMonthIndex = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const chartSeries = trendFromJoinDate.filter((point) => {
+    const parsed = parsePeriod(point.period);
+    if (!parsed) {
+      return false;
+    }
+
+    if (parsed.year < currentYear) {
+      return true;
+    }
+
+    if (parsed.year > currentYear) {
+      return false;
+    }
+
+    return parsed.monthIndex <= currentMonthIndex;
+  });
+
+  const plotXMin = 4;
+  const plotXMax = 96;
+  const plotYMin = 8;
+  const plotYMax = 92;
+  const clamp = (value: number, min: number, max: number): number =>
+    Math.max(min, Math.min(max, value));
+
+  const trendPoints = chartSeries.map((point, index) => {
+    const ratio = chartSeries.length === 1 ? 0.5 : index / (chartSeries.length - 1);
+    const x = plotXMin + ratio * (plotXMax - plotXMin);
+    return {
+      ...point,
+      x,
+    };
+  });
+
+  const smoothedMonthlyTasks = trendPoints.map((point, index) => {
+    const previous = trendPoints[index - 1]?.tasksStarted ?? point.tasksStarted;
+    const next = trendPoints[index + 1]?.tasksStarted ?? point.tasksStarted;
+
+    return (previous + point.tasksStarted * 2 + next) / 4;
+  });
+
+  const monthlyChartMax = Math.max(
+    ...smoothedMonthlyTasks,
+    1,
+  );
+
+  const growthPoints = trendPoints.map((point, index) => {
+    const smoothedValue = smoothedMonthlyTasks[index];
+    const scaledY =
+      plotYMax - (smoothedValue / monthlyChartMax) * (plotYMax - plotYMin);
+
+    return {
+      ...point,
+      y: clamp(scaledY, plotYMin, plotYMax),
+    };
+  });
+
+  const salaryLineY = 56;
+  const salaryPoints = trendPoints.map((point) => ({
+    ...point,
+    y: salaryLineY,
+  }));
+
+  const buildSmoothPath = (points: Array<{ x: number; y: number }>): string => {
+    if (!points.length) {
+      return "";
+    }
+
+    if (points.length === 1) {
+      return `M ${points[0].x},${points[0].y}`;
+    }
+
+    let path = `M ${points[0].x},${points[0].y}`;
+
+    for (let index = 0; index < points.length - 1; index += 1) {
+      const p0 = points[index - 1] ?? points[index];
+      const p1 = points[index];
+      const p2 = points[index + 1];
+      const p3 = points[index + 2] ?? p2;
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+    }
+
+    return path;
+  };
+
+  const tasksLinePath = buildSmoothPath(growthPoints);
+  const salaryLinePath =
+    salaryPoints.length > 1
+      ? `M ${salaryPoints[0].x},${salaryLineY} L ${salaryPoints[salaryPoints.length - 1].x},${salaryLineY}`
+      : salaryPoints.length === 1
+        ? `M ${salaryPoints[0].x},${salaryLineY}`
+        : "";
+  const tasksArea =
+    tasksLinePath && growthPoints.length
+      ? `${tasksLinePath} L ${growthPoints[growthPoints.length - 1].x},${plotYMax} L ${growthPoints[0].x},${plotYMax} Z`
+      : "";
+  const startPeriod = growthPoints[0]?.period ?? "—";
+  const currentPeriod = growthPoints[growthPoints.length - 1]?.period ?? "—";
+
+  const projectsStat = heroStats.find((stat) => stat.id === "projects-covered") ?? heroStats[0];
+  const openedTasksStat = heroStats.find((stat) => stat.id === "tasks-opened") ?? heroStats[1];
+  const testedTasksStat = heroStats.find((stat) => stat.id === "tasks-tested") ?? heroStats[2];
+
   return (
     <main
-      className="relative min-h-screen px-6 py-16"
-      style={{ backgroundColor: "#151922" }}
+      className={`${bodyFont.variable} ${displayFont.variable} qa-home relative min-h-screen overflow-hidden overflow-x-hidden`}
+      data-homepage="qa-promo"
     >
-      <div
-        className="absolute inset-0"
-        style={{ backgroundColor: "#0f121a", opacity: 0.85 }}
-        aria-hidden="true"
-      />
-      <div className="mx-auto max-w-5xl space-y-14 relative z-10">
-        <section id="intro" className="space-y-4 text-center">
-          <h1
-            className="mx-auto text-6xl sm:text-7xl font-extrabold tracking-tight uppercase bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500"
-            aria-label="THE NEXT LEVEL"
-          >
-            THE NEXT LEVEL
-          </h1>
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 8 }}>
-            <RealtimeSinceCounter />
+      <div className="qa-grid-overlay absolute inset-0" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-6xl space-y-16 px-6 py-10 sm:px-8 sm:py-14 lg:px-10 lg:py-16">
+        <section id="hero" className="qa-panel qa-hero-panel space-y-8 rounded-[28px] p-6 sm:p-10">
+          <HomeReveal>
+            <div className="qa-hero-copy">
+              <HomeSectionLabel text="Иван Гриценко / QA" />
+              <h1 className="qa-display qa-hero-title mt-5 max-w-5xl">
+                <span className="block">QA, который</span>
+                <span className="block">подкреплен</span>
+                <span className="block">цифрами и релизами.</span>
+              </h1>
+              <p className="qa-muted qa-hero-lead mt-5 max-w-3xl leading-relaxed">
+                От багов защищено <span className="qa-hero-emphasis">{projectsStat.valueText} проектов</span>:
+                найдено <span className="qa-hero-emphasis">{openedTasksStat.valueText} багов</span> и минимум <span className="qa-hero-emphasis">{testedTasksStat.valueText} протестированных задач</span> — только подтвержденные числа из витрины и проекты, которые можно открыть и проверить руками.
+              </p>
+            </div>
+            <div className="qa-hero-actions mt-7 flex flex-wrap gap-3">
+              <Link href="#charts" className="qa-btn-primary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">
+                Перейти к трендам
+              </Link>
+              <Link href="#projects" className="qa-btn-secondary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">
+                Смотреть проекты
+              </Link>
+            </div>
+          </HomeReveal>
+
+          <div className="qa-hero-metrics grid gap-3 sm:grid-cols-3">
+            {heroStats.map((stat, index) => (
+              <HomeReveal key={stat.id} delay={80 + index * 90}>
+                <article className="qa-hero-kpi h-full rounded-[22px] p-5">
+                  <p className="qa-display qa-hero-kpi-value">{stat.valueText}</p>
+                  <p className="qa-hero-kpi-label mt-3">{stat.label}</p>
+                </article>
+              </HomeReveal>
+            ))}
           </div>
         </section>
 
-        <section id="tools-process" className="pt-6 pb-8">
-          <Card className="mx-auto bg-white/6 border border-white/10 rounded-2xl shadow-xl">
-            <CardHeader className="px-4 py-3 border-b border-white/10">
-              <CardTitle className="text-2xl text-neutral-100">Инструменты и процесс</CardTitle>
-            </CardHeader>
-            <CardContent className="px-4 py-3 text-neutral-200">
-              <ul className="list-disc pl-5 space-y-2">
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Postman</strong> проверяю API-эндпоинты, валидирую ответы и фиксирую отклонения для доработки; использую переменные, формирую коллекции, запускаю <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Collection Runner</strong> и пишу скрипты.</li>
-                <li>Использую <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Swagger</strong> для валидации API: сверяю эндпоинты, обязательные поля, схемы и форматы ответов.</li>
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">DevTools</strong> использую <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Elements</strong>, <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Console</strong>, <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Network</strong>, <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Application</strong> и <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Sources</strong>; дополнительно применяю <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Device Toolbar</strong> (<em>адаптив</em>), <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Throttling</strong>, <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Override</strong> и <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Copy as cURL</strong> для проверки сценариев и воспроизводимости.</li>
-                <li>Контролирую точность верстки: сравниваю UI с макетами в <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Figma</strong> с помощью <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">PerfectPixel</strong>.</li>
-                <li>По мобильным задачам использую <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Console</strong> и логи устройства: анализирую ошибки, воспроизводимость и причины нестабильного поведения.</li>
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Android Studio</strong> использую эмуляторы для проверки мобильных сценариев, логов приложения и поведения интерфейса на разных устройствах.</li>
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">RabbitMQ</strong> отслеживаю прохождение сообщений по очередям для ключевых бизнес‑событий (создание/обновление, пересчеты), при необходимости вручную публикую сообщение.</li>
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">GitLab</strong> проверяю, что задача влита, просматриваю изменения в коде, сверяю с требованиями и при необходимости анализирую <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">CI/CD</strong>.</li>
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Portainer</strong> смотрю контейнер нужного сервиса и анализирую логи. Знаю, как выполнить stop/start/restart.</li>
-                <li>При необходимости в <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Charles</strong> могу проанализировать HTTP-трафик, проверить запросы/ответы и воспроизводимость сетевых проблем.</li>
-                <li>Сокращаю рутинные операции с помощью AI-агентов: использую локальные автотесты и <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Cursor</strong>.</li>
-                <li>Использую <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Perplexity</strong> на ПК и телефоне в едином пространстве для проработки идей тестирования и уточнения тестовых сценариев в любое время.</li>
-                <li>В <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">Photoshop</strong> подготавливаю изображения для тестирования: меняю формат, разрешение и размер файла, выполняю crop под целевые сценарии отображения.</li>
-                <li>В свободное время практикую <strong className="font-semibold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">vibe coding</strong>.</li>
-              </ul>
-            </CardContent>
-          </Card>
+        <section id="skills" className="space-y-5">
+          <HomeSectionLabel text="Скилы: рост и критичные баги" subtle />
+          <div className="grid gap-4 lg:grid-cols-3">
+            {skillTracks.map((track) => (
+              <article key={track.id} className="qa-panel-soft qa-skill-card rounded-2xl p-5">
+                <h2 className="qa-display text-xl">{track.title}</h2>
+                <ul className="qa-muted qa-skill-list qa-skill-scroll mt-3 space-y-3 text-sm leading-relaxed">
+                  {track.items.map((item, index) => (
+                    <li key={`${track.id}-${index}`} className="qa-skill-item">
+                      {track.id === "critical-bugs"
+                        ? item
+                        : renderToolHighlights(item, `${track.id}-${index}`)}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
         </section>
 
-        <section
-          id="projects"
-          className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 space-y-4"
-        >
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold tracking-tight text-neutral-100">Мои проекты</h2>
-              <p className="text-sm text-white/70">Ключевые проекты и мой QA-вклад</p>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-            {PROJECTS.map((project) => (
-              <Card
-                key={project.slug}
-                className="flex h-auto flex-col gap-1 border border-white/10 bg-white/5 py-2 text-white shadow-lg transition hover:border-amber-400/60 md:relative md:h-[236px]"
-              >
-                <CardHeader className="px-4 py-1.5">
-                  <CardTitle className="text-xl">{project.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 pb-2 pt-1 md:pb-10">
-                  {project.cardMetrics && project.cardMetrics.length > 0 ? (
-                    <div className="mb-2 flex flex-wrap gap-1.5">
-                      {project.cardMetrics.slice(0, 2).map((metric) => (
-                        <span
-                          key={metric}
-                          className="rounded-md border border-white/35 bg-white/10 px-2 py-0.5 text-[11px] font-semibold text-white"
-                        >
-                          {metric}
-                        </span>
-                      ))}
-                    </div>
-                  ) : null}
-                  <p
-                    className={
-                      project.cardMetrics && project.cardMetrics.length > 0
-                        ? "text-sm leading-relaxed text-white/80 md:overflow-hidden md:[display:-webkit-box] md:[-webkit-line-clamp:3] md:[-webkit-box-orient:vertical]"
-                        : "text-sm leading-relaxed text-white/80 md:overflow-hidden md:[display:-webkit-box] md:[-webkit-line-clamp:5] md:[-webkit-box-orient:vertical]"
-                    }
-                  >
-                    {project.short}
-                  </p>
-                </CardContent>
-                <div className="mt-3 flex justify-center px-4 pb-2 md:absolute md:bottom-3 md:left-1/2 md:mt-0 md:-translate-x-1/2 md:px-0 md:pb-0">
-                  <Link
-                    href={`/projects/${project.slug}`}
-                    className="inline-flex items-center rounded-full border border-amber-400/70 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-300 transition hover:bg-amber-500/20"
-                  >
+        <section id="charts" className="space-y-5">
+          <HomeSectionLabel text="Тренды" subtle />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <MiniChart
+              growthPoints={growthPoints}
+              salaryPoints={salaryPoints}
+              tasksLinePath={tasksLinePath}
+              tasksArea={tasksArea}
+              salaryLinePath={salaryLinePath}
+              salaryLineY={salaryLineY}
+              plotXMin={plotXMin}
+              plotXMax={plotXMax}
+              plotYMin={plotYMin}
+              plotYMax={plotYMax}
+              startPeriod={startPeriod}
+              currentPeriod={currentPeriod}
+              title="Динамика задач (июнь 2025 - сейчас)"
+              type="tasks"
+            />
+
+            <MiniChart
+              growthPoints={growthPoints}
+              salaryPoints={salaryPoints}
+              tasksLinePath={tasksLinePath}
+              tasksArea={tasksArea}
+              salaryLinePath={salaryLinePath}
+              salaryLineY={salaryLineY}
+              plotXMin={plotXMin}
+              plotXMax={plotXMax}
+              plotYMin={plotYMin}
+              plotYMax={plotYMax}
+              startPeriod={startPeriod}
+              currentPeriod={currentPeriod}
+              title="Динамика зарплаты (июнь 2025 - сейчас)"
+              type="salary"
+            />
+          </div>
+        </section>
+
+        <section id="projects" className="space-y-5">
+          <HomeSectionLabel text="Проекты: эффект, риск, масштаб" subtle />
+          <div className="grid gap-4 md:grid-cols-2" data-testid="project-proof-grid">
+            {projectProof.map((project) => (
+              <article key={project.slug} data-testid={`project-card-${project.slug}`} className="qa-panel-soft flex h-full min-h-[34rem] flex-col rounded-2xl p-5 lg:min-h-[36rem]">
+                <h2 className="qa-display text-2xl">{project.title}</h2>
+                <p className="qa-chip mt-3 rounded-xl px-3 py-2 text-sm leading-relaxed">
+                  <span className="font-semibold">Эффект:</span> {project.impact}
+                </p>
+                <p className="qa-muted mt-2 text-sm leading-relaxed">
+                  <span className="font-semibold">Снятый риск:</span>{" "}
+                  {project.riskReduction}
+                </p>
+                <p className="qa-muted mt-1 text-sm leading-relaxed">
+                  <span className="font-semibold">Сигнал масштаба:</span>{" "}
+                  {project.scaleSignal}
+                </p>
+                <ul className="qa-muted mt-3 list-disc space-y-1 pl-5 text-sm leading-relaxed">
+                  {project.proofPoints.map((proof) => (
+                    <li key={proof}>{proof}</li>
+                  ))}
+                </ul>
+                <div className="mt-auto pt-6">
+                  <Link href={`/projects/${project.slug}`} className="qa-btn-primary inline-flex items-center self-start rounded-full px-4 py-2 text-sm font-semibold transition">
                     Открыть проект
                   </Link>
                 </div>
-              </Card>
+              </article>
             ))}
-            </div>
+          </div>
         </section>
-        <section className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              title: "Разные типы файлов",
-              text: "Изображения, PDF и архивы в одной галерее с метаданными.",
-            },
-            {
-              title: "Быстрая админка",
-              text: "Мультизагрузка и скрытие/восстановление в один клик.",
-            },
-            {
-              title: "Docker-first",
-              text: "Локальный запуск с надежным хранением в volume.",
-            },
-          ].map((item) => (
-            <Card key={item.title} className="bg-white/6 border border-white/10 rounded-xl shadow-xl">
-              <CardHeader className="px-4 py-3 border-b border-white/10">
-                <CardTitle className="text-lg text-neutral-100">{item.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 py-3 text-neutral-200">
-                <p className="text-sm">{item.text}</p>
-              </CardContent>
-            </Card>
-          ))}
+
+        <section id="closing" className="qa-panel rounded-[24px] p-6 sm:p-8">
+          <HomeSectionLabel text="Финальный акцент" subtle />
+          <h2 className="qa-display mt-4 text-3xl leading-tight sm:text-4xl">{closingSummary.headline}</h2>
+          <p className="qa-muted mt-4 max-w-3xl text-base leading-relaxed">{closingSummary.body}</p>
+          <p className="qa-soft mt-3 text-xs">{closingSummary.evidenceLabel}. {closingSummary.evidenceNote}</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="#charts" className="qa-btn-primary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">
+              {closingSummary.ctaLabel}
+            </Link>
+            <Link href="#projects" className="qa-btn-secondary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">
+              Открыть блок проектов
+            </Link>
+          </div>
         </section>
       </div>
     </main>
