@@ -281,15 +281,17 @@ export default function Home() {
             {skillTracks.map((track) => (
               <article key={track.id} className="qa-panel-soft qa-skill-card rounded-2xl p-5">
                 <h2 className="qa-display text-xl">{track.title}</h2>
-                <ul className="qa-muted qa-skill-list qa-skill-scroll mt-3 space-y-3 text-sm leading-relaxed">
-                  {track.items.map((item, index) => (
-                    <li key={`${track.id}-${index}`} className="qa-skill-item">
-                      {track.id === "critical-bugs"
-                        ? item
-                        : renderToolHighlights(item, `${track.id}-${index}`)}
-                    </li>
-                  ))}
-                </ul>
+                <div className="qa-skill-scroll-wrap mt-3">
+                  <ul className="qa-muted qa-skill-list qa-skill-scroll space-y-3 text-sm leading-relaxed">
+                    {track.items.map((item, index) => (
+                      <li key={`${track.id}-${index}`} className="qa-skill-item">
+                        {track.id === "critical-bugs"
+                          ? item
+                          : renderToolHighlights(item, `${track.id}-${index}`)}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </article>
             ))}
           </div>

@@ -350,6 +350,24 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 0.4rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+
+.qa-skill-scroll-wrap {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.qa-skill-scroll-wrap::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2.8rem;
+  background: linear-gradient(180deg, rgba(255, 250, 247, 0) 0%, color-mix(in oklab, var(--qa-surface-soft) 90%, white) 86%);
+  pointer-events: none;
 }
 
 .qa-skill-item {
@@ -373,7 +391,7 @@
 
 @media (max-width: 1024px) {
   .qa-skill-card {
-    min-height: 24rem;
-    max-height: 24rem;
+    min-height: 30rem;
+    max-height: 30rem;
   }
 }
