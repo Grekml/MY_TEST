@@ -327,6 +327,7 @@
 .qa-skill-list {
   padding-left: 1rem;
   list-style: disc;
+  min-width: 0;
 }
 
 .qa-skill-item::marker {
@@ -349,9 +350,13 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 0.4rem;
+  width: calc(100% + 1rem);
+  margin-right: -1rem;
+  padding-right: 1.35rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
 .qa-skill-scroll-wrap {
@@ -359,6 +364,8 @@
   display: flex;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+  padding-right: 0.7rem;
 }
 
 .qa-skill-scroll-wrap::after {
@@ -373,20 +380,41 @@
 .qa-skill-item {
   overflow-wrap: anywhere;
   word-break: break-word;
+  max-width: 100%;
 }
 
-.qa-skill-scroll::-webkit-scrollbar {
-  width: 0.45rem;
+.qa-native-scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.qa-skill-scroll::-webkit-scrollbar-track {
-  background: color-mix(in oklab, var(--qa-surface-soft) 82%, white);
+.qa-native-scrollbar-hide::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.qa-mobile-scroll-track {
+  position: absolute;
+  top: 0;
+  right: 0.15rem;
+  bottom: 0.25rem;
+  width: 0.72rem;
   border-radius: 999px;
+  background: color-mix(in oklab, var(--qa-brand-soft) 35%, white);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--qa-brand) 15%, var(--qa-border));
+  pointer-events: none;
+  z-index: 2;
 }
 
-.qa-skill-scroll::-webkit-scrollbar-thumb {
-  background: color-mix(in oklab, var(--qa-brand-soft) 76%, var(--qa-border));
+.qa-mobile-scroll-thumb {
+  position: absolute;
+  left: 0.07rem;
+  width: calc(100% - 0.14rem);
   border-radius: 999px;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--qa-brand-soft) 50%, white) 0%, color-mix(in oklab, var(--qa-brand) 78%, #991b1b) 100%);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--qa-brand) 32%, transparent);
+  transition: transform 80ms linear;
 }
 
 @media (max-width: 1024px) {

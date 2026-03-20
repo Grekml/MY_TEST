@@ -7,60 +7,9 @@ import {
 } from "@/components/home/primitives";
 import { HomeReveal } from "@/components/home/reveal";
 import { MiniChart } from "@/components/home/MiniChart";
+import { SkillTrackCard } from "@/components/home/SkillTrackCard";
 import { QA_PROMOTION_CONTENT } from "@/lib/qa-promotion-content";
 import "./qa-promo.css";
-
-const TOOL_HIGHLIGHTS = [
-  "Collection Runner",
-  "Device Toolbar",
-  "Copy as cURL",
-  "Android Studio",
-  "PerfectPixel",
-  "Throttling",
-  "Application",
-  "Perplexity",
-  "Postman",
-  "Swagger",
-  "DevTools",
-  "Elements",
-  "Console",
-  "Network",
-  "Sources",
-  "Override",
-  "RabbitMQ",
-  "GitLab",
-  "CI/CD",
-  "Portainer",
-  "DataGrip",
-  "Charles",
-  "Cursor",
-  "Photoshop",
-  "Figma",
-  "vibe coding",
-].sort((a, b) => b.length - a.length);
-
-const TOOL_HIGHLIGHT_SET = new Set(TOOL_HIGHLIGHTS.map((tool) => tool.toLowerCase()));
-
-const escapeRegExp = (value: string): string =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const TOOL_HIGHLIGHT_RE = new RegExp(
-  `(${TOOL_HIGHLIGHTS.map((tool) => escapeRegExp(tool)).join("|")})`,
-  "gi",
-);
-
-const renderToolHighlights = (text: string, keyPrefix: string) =>
-  text.split(TOOL_HIGHLIGHT_RE).map((chunk, index) => {
-    if (TOOL_HIGHLIGHT_SET.has(chunk.toLowerCase())) {
-      return (
-        <span key={`${keyPrefix}-${index}`} className="qa-tool-mark">
-          {chunk}
-        </span>
-      );
-    }
-
-    return <span key={`${keyPrefix}-${index}`}>{chunk}</span>;
-  });
 
 const bodyFont = Martian_Mono({
   subsets: ["latin"],
@@ -279,20 +228,12 @@ export default function Home() {
           <HomeSectionLabel text="Скилы: рост и критичные баги" subtle />
           <div className="grid gap-4 lg:grid-cols-3">
             {skillTracks.map((track) => (
-              <article key={track.id} className="qa-panel-soft qa-skill-card rounded-2xl p-5">
-                <h2 className="qa-display text-xl">{track.title}</h2>
-                <div className="qa-skill-scroll-wrap mt-3">
-                  <ul className="qa-muted qa-skill-list qa-skill-scroll space-y-3 text-sm leading-relaxed">
-                    {track.items.map((item, index) => (
-                      <li key={`${track.id}-${index}`} className="qa-skill-item">
-                        {track.id === "critical-bugs"
-                          ? item
-                          : renderToolHighlights(item, `${track.id}-${index}`)}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </article>
+              <SkillTrackCard
+                key={track.id}
+                title={track.title}
+                items={track.items}
+                disableHighlight={track.id === "critical-bugs"}
+              />
             ))}
           </div>
         </section>
