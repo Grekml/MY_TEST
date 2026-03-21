@@ -180,6 +180,10 @@ export default function Home() {
   const projectsStat = heroStats.find((stat) => stat.id === "projects-covered") ?? heroStats[0];
   const openedTasksStat = heroStats.find((stat) => stat.id === "tasks-opened") ?? heroStats[1];
   const testedTasksStat = heroStats.find((stat) => stat.id === "tasks-tested") ?? heroStats[2];
+  const closingParagraphs = closingSummary.body
+    .split("\n\n")
+    .map((paragraph) => paragraph.trim())
+    .filter((paragraph) => paragraph.length > 0);
 
   return (
     <main
@@ -225,7 +229,7 @@ export default function Home() {
         </section>
 
         <section id="skills" className="space-y-5">
-          <HomeSectionLabel text="Скилы: рост и критичные баги" subtle />
+          <HomeSectionLabel text="Скиллы: рост и критичные баги" subtle />
           <div className="grid gap-4 lg:grid-cols-3">
             {skillTracks.map((track) => (
               <SkillTrackCard
@@ -312,7 +316,11 @@ export default function Home() {
         <section id="closing" className="qa-panel rounded-[24px] p-6 sm:p-8">
           <HomeSectionLabel text="Финальный акцент" subtle />
           <h2 className="qa-display mt-4 text-3xl leading-tight sm:text-4xl">{closingSummary.headline}</h2>
-          <p className="qa-muted mt-4 max-w-3xl text-base leading-relaxed">{closingSummary.body}</p>
+          <div className="qa-muted mt-4 max-w-3xl space-y-4 text-base leading-relaxed">
+            {closingParagraphs.map((paragraph, index) => (
+              <p key={`closing-paragraph-${index}`}>{paragraph}</p>
+            ))}
+          </div>
           <p className="qa-soft mt-3 text-xs">{closingSummary.evidenceLabel}. {closingSummary.evidenceNote}</p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="#charts" className="qa-btn-primary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">

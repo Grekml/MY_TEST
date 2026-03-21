@@ -11,6 +11,8 @@
   --qa-display-font: var(--font-display), var(--font-body), sans-serif;
   --qa-skill-scroll-track: color-mix(in oklab, var(--qa-surface-soft) 82%, white);
   --qa-skill-scroll-thumb: color-mix(in oklab, var(--qa-brand-soft) 76%, var(--qa-border));
+  --qa-skill-fade-height: 2.8rem;
+  --qa-skill-safe-bottom: 0.8rem;
 }
 
 .qa-home {
@@ -353,6 +355,8 @@
   overflow-y: auto;
   overflow-x: hidden;
   padding-right: 0.5rem;
+  padding-bottom: calc(var(--qa-skill-fade-height) + var(--qa-skill-safe-bottom));
+  scroll-padding-bottom: calc(var(--qa-skill-fade-height) + var(--qa-skill-safe-bottom));
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   scrollbar-width: thin;
@@ -372,7 +376,7 @@
   content: "";
   position: absolute;
   inset: auto 0 0 0;
-  height: 2.8rem;
+  height: var(--qa-skill-fade-height);
   background: linear-gradient(180deg, rgba(255, 250, 247, 0) 0%, color-mix(in oklab, var(--qa-surface-soft) 90%, white) 86%);
   pointer-events: none;
 }
