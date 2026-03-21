@@ -76,29 +76,29 @@ export default async function ProjectDetailsPage({ params }: Props) {
           ) : null}
         </div>
 
-        <section className="grid gap-5 lg:grid-cols-2">
-          <Card className="qa-panel-soft border-none text-inherit shadow-none">
+        <section className="grid min-w-0 gap-5 lg:grid-cols-2">
+          <Card className="qa-panel-soft min-w-0 border-none text-inherit shadow-none">
             <CardHeader className="px-5 pb-0 pt-4">
-              <CardTitle className="qa-display text-2xl">Что я тестировал</CardTitle>
+              <CardTitle className="qa-display break-words text-2xl">Что я тестировал</CardTitle>
             </CardHeader>
             <CardContent className="px-5 pb-5 pt-3">
-              <ul className="qa-muted list-disc space-y-3 pl-5 marker:text-[color:var(--qa-ink-muted)]">
+              <ul className="qa-muted list-disc space-y-3 break-words pl-5 marker:text-[color:var(--qa-ink-muted)] [overflow-wrap:anywhere]">
                 {testedItems.map((item) => (
-                  <li key={item} className="leading-relaxed">{item}</li>
+                  <li key={item} className="leading-relaxed break-words [overflow-wrap:anywhere]">{item}</li>
                 ))}
               </ul>
             </CardContent>
           </Card>
 
           {bugsItems.length > 0 ? (
-            <Card className="qa-panel-soft border-none text-inherit shadow-none">
+            <Card className="qa-panel-soft min-w-0 border-none text-inherit shadow-none">
               <CardHeader className="px-5 pb-0 pt-4">
-                <CardTitle className="qa-display text-2xl">Какие значимые проблемы находил</CardTitle>
+                <CardTitle className="qa-display break-words text-2xl">Какие значимые проблемы находил</CardTitle>
               </CardHeader>
               <CardContent className="px-5 pb-5 pt-3">
-                <ul className="qa-muted list-disc space-y-3 pl-5 marker:text-[color:var(--qa-ink-muted)]">
+                <ul className="qa-muted list-disc space-y-3 break-words pl-5 marker:text-[color:var(--qa-ink-muted)] [overflow-wrap:anywhere]">
                   {bugsItems.map((item) => (
-                    <li key={item} className="leading-relaxed">{item}</li>
+                    <li key={item} className="leading-relaxed break-words [overflow-wrap:anywhere]">{item}</li>
                   ))}
                 </ul>
               </CardContent>
@@ -106,14 +106,14 @@ export default async function ProjectDetailsPage({ params }: Props) {
           ) : null}
 
           {contributionItems.length > 0 ? (
-            <Card className="qa-panel border-none text-inherit shadow-none lg:col-span-2">
+            <Card className="qa-panel min-w-0 border-none text-inherit shadow-none lg:col-span-2">
               <CardHeader className="px-5 pb-0 pt-4">
-                <CardTitle className="qa-display text-2xl">Мой вклад</CardTitle>
+                <CardTitle className="qa-display break-words text-2xl">Мой вклад</CardTitle>
               </CardHeader>
               <CardContent className="px-5 pb-5 pt-3">
-                <ul className="qa-muted list-disc space-y-3 pl-5 marker:text-[color:var(--qa-ink-muted)]">
+                <ul className="qa-muted list-disc space-y-3 break-words pl-5 marker:text-[color:var(--qa-ink-muted)] [overflow-wrap:anywhere]">
                   {contributionItems.map((item) => (
-                    <li key={item} className="leading-relaxed">{item}</li>
+                    <li key={item} className="leading-relaxed break-words [overflow-wrap:anywhere]">{item}</li>
                   ))}
                 </ul>
               </CardContent>
