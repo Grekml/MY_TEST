@@ -319,14 +319,6 @@ export default function Home() {
             ))}
           </div>
           <p className="qa-soft mt-3 text-xs">{closingSummary.evidenceLabel}. {closingSummary.evidenceNote}</p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="#charts" className="qa-btn-primary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">
-              {closingSummary.ctaLabel}
-            </Link>
-            <Link href="#projects" className="qa-btn-secondary inline-flex items-center rounded-full px-5 py-2.5 text-sm font-semibold transition">
-              Открыть блок проектов
-            </Link>
-          </div>
         </section>
       </div>
     </main>
