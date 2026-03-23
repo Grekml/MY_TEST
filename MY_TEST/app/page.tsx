@@ -197,13 +197,10 @@ export default function Home() {
             <div className="qa-hero-copy">
               <HomeSectionLabel text="Иван Гриценко / QA" />
               <h1 className="qa-display qa-hero-title mt-5 max-w-5xl">
-                <span className="block">QA, который</span>
-                <span className="block">подкреплен</span>
-                <span className="block">цифрами и релизами.</span>
+                <span className="block">Качество продукта начинается до релиза</span>
               </h1>
               <p className="qa-muted qa-hero-lead mt-5 max-w-3xl leading-relaxed">
-                От багов защищено <span className="qa-hero-emphasis">{projectsStat.valueText} проектов</span>:
-                найдено <span className="qa-hero-emphasis">{openedTasksStat.valueText} багов</span> и минимум <span className="qa-hero-emphasis">{testedTasksStat.valueText} протестированных задач</span> — только подтвержденные числа из витрины и проекты, которые можно открыть и проверить руками.
+                Помогаю командам выявлять дефекты, делать процесс тестирования прозрачным и оперативно подтверждать фиксы через ретест.
               </p>
             </div>
             <div className="qa-hero-actions mt-7 flex flex-wrap gap-3">
